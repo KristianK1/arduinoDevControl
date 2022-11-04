@@ -3,8 +3,9 @@
 
 #include "web/WifiConnection/WifiState.h"
 #include "web/APIrequests/HTTP.h"
+#include "web/WSSConnection/WS.h"
 
-class Device : WiFistate, HTTP
+class Device : WiFistate, HTTP, WS
 {
 private:
 public:
@@ -30,6 +31,13 @@ public:
                 Serial.println(result.payload);
             }
             Serial.println((millis() - CurrMillis));
+
+            Serial.println("prije" + WS::isConnected());
+            if (!WS::isConnected())
+            {
+                WS::connectToWS();
+            }
+            Serial.println("poslije" + WS::isConnected());
         }
         delay(5000);
     }

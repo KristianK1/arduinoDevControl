@@ -14,7 +14,7 @@ class HTTP
 {
 private:
     HTTPClient http;
-    String basicLink = String("https://devcontrol-backend-proba1.onrender.com/");
+    String basicLink = "https://devcontrol-backend-proba1.onrender.com/";
 
 public:
     HTTPresult get(String subLink)
@@ -49,16 +49,16 @@ public:
         int responseCode = http.POST(body);
         Serial.println("3");
 
-        // if (responseCode > 0)
-        // {
+        if (responseCode > 0)
+        {
             result.success = true;
             result.statusCode = responseCode;
             result.payload = http.getString();
-        // }
-        // else
-        // {
-        //     result.success = false;
-        // }
+        }
+        else
+        {
+            result.success = false;
+        }
         http.end();
         Serial.println("4");
 
