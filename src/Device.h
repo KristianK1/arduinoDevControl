@@ -32,12 +32,7 @@ public:
             }
             Serial.println((millis() - CurrMillis));
 
-            Serial.println("prije" + WS::isConnected());
-            if (!WS::isConnected())
-            {
-                WS::connectToWS();
-            }
-            Serial.println("poslije" + WS::isConnected());
+            WS::connectAndMaintainConnection();
         }
         delay(5000);
     }
