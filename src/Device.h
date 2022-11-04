@@ -24,10 +24,10 @@ public:
         if (wifiConn)
         {
             int CurrMillis = millis();
-            HTTPresult result = HTTP::get(String("API/device/1"));
+            HTTPresult result = HTTP::post("API/userAuth/register", "{\"username\":\"esp32\",\"password\":\"esp32\",\"email\":\"emaill\"}");
             if (result.success)
             {
-                // Serial.println(result.payload);
+                Serial.println(result.payload);
             }
             Serial.println((millis() - CurrMillis));
         }
