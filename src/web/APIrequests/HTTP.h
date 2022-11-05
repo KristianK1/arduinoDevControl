@@ -43,12 +43,8 @@ public:
         HTTPresult result;
         String fullLink = basicLink + sublink;
         http.begin(fullLink.c_str());
-        Serial.println("1");
         http.addHeader("Content-Type", "text/html; charset=utf-8");
-        Serial.println("2");
         int responseCode = http.POST(body);
-        Serial.println("3");
-
         if (responseCode > 0)
         {
             result.success = true;
@@ -60,8 +56,6 @@ public:
             result.success = false;
         }
         http.end();
-        Serial.println("4");
-
         return result;
     }
 };

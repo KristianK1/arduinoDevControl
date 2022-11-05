@@ -4,6 +4,9 @@
 #include <WiFi.h>
 #include "WifiCreds.h"
 
+// char *ssid = "xxxxxxxxxxxxx";
+// char *password = "xxxxxxxxxxxxxxxx";
+
 class WiFistate
 {
 private:

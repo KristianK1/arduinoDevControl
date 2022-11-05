@@ -13,7 +13,9 @@ typedef struct wSConnection
 class WS
 {
 private:
-    String basicLink = "wss://devcontrol-backend-proba1.onrender.com/";
+    // String basicLink = "wss://devcontrol-backend-proba1.onrender.com/";
+    String basicLink = "ws://192.168.1.100:8000";
+    
     esp_websocket_client_handle_t handle;
     WSConnection *connection;
 

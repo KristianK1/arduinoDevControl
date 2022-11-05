@@ -4,7 +4,7 @@ Device myDevice;
 
 void setup(){
     pinMode(2, OUTPUT);
-    Serial.begin(9600);    
+    Serial.begin(115200);    
 }
 
 void loop(){
