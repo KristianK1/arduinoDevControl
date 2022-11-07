@@ -1,50 +1,80 @@
 #ifndef WS_H
 #define WS_H
 
+#include "../../deviceKey.h"
 #include "esp_websocket_client.h"
+#include "ArduinoJson.h"
 
-typedef struct wSConnection
+typedef struct wSSDeviceConnectRequest
+{
+    String deviceKey;
+} WSSDeviceConnectRequest;
+
+typedef struct wSSFirstMessage
+{
+    String messageType;
+    WSSDeviceConnectRequest data;
+} WSSFirstMessage;
+
+typedef struct wSSConnection
 {
     long timeConnected; // millis
     esp_websocket_client_handle_t handle;
-    wSConnection *nextConnection;
-} WSConnection;
+    wSSConnection *nextConnection;
+} WSSConnection;
 
 class WS
 {
 private:
     // String basicLink = "wss://devcontrol-backend-proba1.onrender.com/";
-    String basicLink = "ws://192.168.1.100:8000";
-    
-    esp_websocket_client_handle_t handle;
-    WSConnection *connection;
+    String basicLink = "ws://192.168.1.103:8000";
+    WSSConnection *connection;
 
 public:
     bool connectAndMaintainConnection()
     {
         if (connection == NULL)
         {
-            connection = (WSConnection *)calloc(1, sizeof(WSConnection));
-            connectToWS(connection);
+            startFirstConnection();
+        }
+        else if (!isConnected())
+        {
+            startNextConnection();
         }
         else
         {
-            if (millis() - connection->timeConnected > 0.5 * 60 * 1000)
+            if (millis() - connection->timeConnected > 0.5 * 60 * 1000) // set to 4.99 mins later
             {
-                if (connection->nextConnection == NULL)
-                {
-                    connection->nextConnection = (WSConnection *)calloc(1, sizeof(WSConnection));
-                    bool connected = connectToWS(connection->nextConnection);
-                    if(connected){
-                        disconnectWS(*connection);
-                        connection = connection->nextConnection;
-                    }
-                }
+                startNextConnection();
             }
         }
     }
 
-    bool connectToWS(WSConnection *newConn)
+    void startFirstConnection()
+    {
+        connection = (WSSConnection *)calloc(1, sizeof(WSSConnection));
+        bool connected = connectToWS(connection);
+        if (connected)
+        {
+            sendfirstWSSMessage();
+        }
+    }
+
+    void startNextConnection()
+    {
+        connection->nextConnection = (WSSConnection *)calloc(1, sizeof(WSSConnection));
+        bool connected = connectToWS(connection->nextConnection);
+        if (connected)
+        {
+            sendfirstWSSMessage();
+            disconnectWS(*connection);
+            wSSConnection *connectionTemp = connection;
+            connection = connection->nextConnection;
+            delete (connectionTemp);
+        }
+    }
+
+    bool connectToWS(WSSConnection *newConn)
     {
         const esp_websocket_client_config_t ws_cfg = {
             .uri = basicLink.c_str(),
@@ -53,21 +83,43 @@ public:
         esp_err_t x = esp_websocket_client_start(newHandle);
         while (esp_websocket_client_is_connected(newHandle) == false)
         {
+            delay(50);
+            Serial.println(millis());
         }
-        WSConnection newConnection;
+        WSSConnection newConnection;
         newConn->handle = newHandle;
         newConn->timeConnected = millis();
         newConn->nextConnection = NULL;
         return true;
     }
 
-    void disconnectWS(WSConnection conn){
+    void disconnectWS(WSSConnection conn){
         esp_websocket_client_stop(conn.handle);
     }
 
     bool isConnected()
     {
-        return esp_websocket_client_is_connected(handle);
+        return esp_websocket_client_is_connected(connection->handle);
+    }
+
+    bool sendfirstWSSMessage()
+    {
+        WSSFirstMessage message;
+        message.messageType = "connectDevice";
+        message.data.deviceKey = deviceKey;
+
+        DynamicJsonDocument doc(1024);
+        doc["messageType"] = message.messageType;
+        doc["data"]["deviceKey"] = message.data.deviceKey;
+        String myString;
+        serializeJson(doc, myString);
+        Serial.println(myString);
+        sendMessage(myString);
+    }
+
+    void sendMessage(String data)
+    {
+        esp_websocket_client_send_text(connection->handle, data.c_str(), data.length(), 5000);
     }
 };
 

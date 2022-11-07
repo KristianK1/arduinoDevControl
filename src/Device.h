@@ -1,13 +1,15 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-#include "web/WifiConnection/WifiState.h"
-#include "web/APIrequests/HTTP.h"
-#include "web/WSSConnection/WS.h"
+#include "web\WifiConnection\WifiState.h"
+#include "web\APIrequests\HTTP.h"
+#include "web\WSSConnection\WS.h"
 
 class Device : WiFistate, HTTP, WS
 {
 private:
+    int tempTimer = millis();
+
 public:
     Device()
     {
@@ -24,17 +26,20 @@ public:
         digitalWrite(2, wifiConn);
         if (wifiConn)
         {
-            int CurrMillis = millis();
-            HTTPresult result = HTTP::post("API/userAuth/register", "{\"username\":\"esp32\",\"password\":\"esp32\",\"email\":\"emaill\"}");
-            if (result.success)
-            {
-                Serial.println(result.payload);
-            }
-            Serial.println((millis() - CurrMillis));
-
+            // if (millis() - tempTimer > 10000)
+            // {
+            //     Serial.println("post");
+            //     tempTimer = millis();
+            //     HTTPresult result = HTTP::post("API/userAuth/register", "{\"username\":\"esp32_BBB\",\"password\":\"esp32\",\"email\":\"emaill\"}");
+            //     if (result.success)
+            //     {
+            //         Serial.println(result.payload);
+            //     }
+            // }
             WS::connectAndMaintainConnection();
         }
-        delay(5000);
+
+        delay(500);
     }
 };
 

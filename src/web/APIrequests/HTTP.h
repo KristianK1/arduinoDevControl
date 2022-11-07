@@ -14,7 +14,8 @@ class HTTP
 {
 private:
     HTTPClient http;
-    String basicLink = "https://devcontrol-backend-proba1.onrender.com/";
+    // String basicLink = "https://devcontrol-backend-proba1.onrender.com/";
+    String basicLink = "http://192.168.1.103:8000/";
 
 public:
     HTTPresult get(String subLink)
@@ -54,6 +55,8 @@ public:
         else
         {
             result.success = false;
+            result.payload = http.getString();
+            Serial.println(result.payload);
         }
         http.end();
         return result;

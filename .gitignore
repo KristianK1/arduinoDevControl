@@ -1,2 +1,3 @@
 *build
 src/web/WifiConnection/WifiCreds.h
+src/deviceKey.h
