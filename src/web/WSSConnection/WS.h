@@ -66,11 +66,11 @@ public:
         bool connected = connectToWS(connection->nextConnection);
         if (connected)
         {
-            sendfirstWSSMessage();
             disconnectWS(*connection);
             wSSConnection *connectionTemp = connection;
             connection = connection->nextConnection;
             delete (connectionTemp);
+            sendfirstWSSMessage();
         }
     }
 
