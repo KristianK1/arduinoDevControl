@@ -4,8 +4,8 @@
 #include <WiFi.h>
 #include "WifiCreds.h"
 
-// char *ssid = "xxxxxxxxxxxxx";
-// char *password = "xxxxxxxxxxxxxxxx";
+// String ssid = "xxxxxxxxxxxxx";
+// String password = "xxxxxxxxxxx";
 
 class WiFistate
 {
@@ -15,11 +15,11 @@ public:
     {
         int connectTimeout = 8000;
         int startMillis = millis();
-        WiFi.begin(ssid, password);
+        WiFi.begin(ssid.c_str(), password.c_str());
 
         while (WiFi.status() != WL_CONNECTED)
         {
-            if (millis() - startMillis > connectTimeout)
+            if (millis() - startMillis > connectTimeout) 
                 break;
             delay(500);
             Serial.println("qqConnecting to WiFi..");
