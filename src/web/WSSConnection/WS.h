@@ -58,6 +58,11 @@ public:
         {
             sendfirstWSSMessage();
         }
+        else
+        {
+            delete (connection);
+            connection = NULL;
+        }
     }
 
     void startNextConnection()
@@ -72,6 +77,10 @@ public:
             delete (connectionTemp);
             sendfirstWSSMessage();
         }
+        else
+        {
+            delete (connection->nextConnection);
+        }
     }
 
     bool connectToWS(WSSConnection *newConn)
@@ -81,10 +90,15 @@ public:
         };
         esp_websocket_client_handle_t newHandle = esp_websocket_client_init(&ws_cfg);
         esp_err_t x = esp_websocket_client_start(newHandle);
-        while (esp_websocket_client_is_connected(newHandle) == false)
+        int startedConnect = millis();
+        while (esp_websocket_client_is_connected(newHandle) == false && millis() - startedConnect < 10000)
         {
             delay(50);
-            Serial.println(millis());
+            Serial.println("connecting to WSS");
+        }
+        if (esp_websocket_client_is_connected(newHandle) == false)
+        {
+            return false;
         }
         WSSConnection newConnection;
         newConn->handle = newHandle;
@@ -93,7 +107,8 @@ public:
         return true;
     }
 
-    void disconnectWS(WSSConnection conn){
+    void disconnectWS(WSSConnection conn)
+    {
         esp_websocket_client_stop(conn.handle);
     }
 
