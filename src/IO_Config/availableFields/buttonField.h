@@ -1,12 +1,11 @@
 #ifndef BUTTON_FIELD_H
 #define BUTTON_FIELD_H
 
-class ButtonField
+#include "basicField.h"
+
+class ButtonField : public BasicField
 {
 private:
-    int mFieldId;
-    String mFieldName;
-
     boolean mValue;
 
 public:
@@ -14,7 +13,7 @@ public:
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
-        
+
         mValue = value;
     }
 
@@ -30,11 +29,6 @@ public:
     void setValue(boolean value)
     {
         mValue = value;
-    }
-
-    int getFieldId()
-    {
-        return mFieldId;
     }
 };
 

@@ -1,12 +1,11 @@
 #ifndef TEXT_FIELD_H
 #define TEXT_FIELD_H
 
-class TextField
+#include"basicField.h"
+
+class TextField: public BasicField
 {
 private:
-    int mFieldId;
-    String mFieldName;
-
     String mValue;
 
 public:
@@ -30,11 +29,6 @@ public:
     void setValue(String value)
     {
         mValue = value;
-    }
-
-    int getFieldId()
-    {
-        return mFieldId;
     }
 };
 

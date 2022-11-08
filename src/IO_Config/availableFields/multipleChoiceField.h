@@ -1,12 +1,11 @@
 #ifndef MULTIPLE_CHOICE_FIELD_H
 #define MULTIPLE_CHOICE_FIELD_H
 
-class MultipleChoiceField
+#include "basicField.h"
+
+class MultipleChoiceField : public BasicField
 {
 private:
-    int mFieldId;
-    String mFieldName;
-
     String *mChoices;
     int NofChoices;
     int mValue;
@@ -19,7 +18,7 @@ public:
         mFieldName = fieldName;
         mChoices = (String *)calloc(num, sizeof(String));
         mValue = 0;
-        
+
         va_list arguments;        // A place to store the list of arguments
         va_start(arguments, num); // Initializing arguments to store all values after num
 
@@ -55,11 +54,6 @@ public:
                 return;
             }
         }
-    }
-
-    int getFieldId()
-    {
-        return mFieldId;
     }
 };
 

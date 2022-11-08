@@ -1,12 +1,11 @@
 #ifndef NUMERIC_FIELD_H
 #define NUMERIC_FIELD_H
 
-class NumericField
+#include "basicField.h"
+
+class NumericField: public BasicField
 {
 private:
-    int mFieldId;
-    String mFieldName;
-
     double mMinValue;
     double mMaxValue;
     double mStep;
@@ -49,11 +48,6 @@ public:
     void setValue(double value)
     {
         mValue = value;
-    }
-
-    int getFieldId()
-    {
-        return mFieldId;
     }
 };
 
