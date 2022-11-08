@@ -56,7 +56,7 @@ public:
         bool connected = connectToWS(connection);
         if (connected)
         {
-            sendfirstWSSMessage();
+            sendfirstWSSMessage(*connection);
         }
         else
         {
@@ -71,11 +71,11 @@ public:
         bool connected = connectToWS(connection->nextConnection);
         if (connected)
         {
+            sendfirstWSSMessage(*connection->nextConnection);
             disconnectWS(*connection);
             wSSConnection *connectionTemp = connection;
             connection = connection->nextConnection;
             delete (connectionTemp);
-            sendfirstWSSMessage();
         }
         else
         {
@@ -118,7 +118,7 @@ public:
         return esp_websocket_client_is_connected(connection->handle);
     }
 
-    bool sendfirstWSSMessage()
+    bool sendfirstWSSMessage(WSSConnection conn)
     {
         WSSFirstMessage message;
         message.messageType = "connectDevice";
@@ -130,12 +130,12 @@ public:
         String myString;
         serializeJson(doc, myString);
         Serial.println(myString);
-        sendMessage(myString);
+        sendMessage(conn, myString);
     }
 
-    void sendMessage(String data)
+    void sendMessage(WSSConnection conn, String data)
     {
-        esp_websocket_client_send_text(connection->handle, data.c_str(), data.length(), 5000);
+        esp_websocket_client_send_text(conn.handle, data.c_str(), data.length(), 5000);
     }
 };
 
