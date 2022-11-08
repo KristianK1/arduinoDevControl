@@ -15,6 +15,7 @@ public:
     {
         int connectTimeout = 8000;
         int startMillis = millis();
+        WiFi.disconnect(true);
         WiFi.begin(ssid.c_str(), password.c_str());
 
         while (WiFi.status() != WL_CONNECTED)
