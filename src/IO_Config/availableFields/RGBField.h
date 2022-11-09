@@ -1,14 +1,14 @@
 #ifndef RGB_FIELD_H
 #define RGB_FIELD_H
 
-#include"basicField.h"
+#include "basicField.h"
 
 typedef struct rgb
 {
     int R, G, B; // [0,255] ?
 } RGB;
 
-class RGBField: public BasicField
+class RGBField : public BasicField
 {
 private:
     RGB mValue;
@@ -28,7 +28,7 @@ public:
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
-        
+
         mValue.B = R;
         mValue.G = G;
         mValue.B = B;
@@ -46,6 +46,18 @@ public:
     void setValue(RGB value)
     {
         mValue = value;
+    }
+
+    void setValue(int R, int G, int B)
+    {
+        mValue.B = R;
+        mValue.G = G;
+        mValue.B = B;
+    }
+
+    int getId()
+    {
+        return BasicField::getId();
     }
 };
 

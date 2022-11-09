@@ -3,7 +3,7 @@
 
 #include "basicField.h"
 
-class NumericField: public BasicField
+class NumericField : public BasicField
 {
 private:
     double mMinValue;
@@ -48,6 +48,11 @@ public:
     void setValue(double value)
     {
         mValue = value;
+    }
+
+    int getId()
+    {
+        return BasicField::getId();
     }
 };
 

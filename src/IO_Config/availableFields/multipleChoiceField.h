@@ -13,7 +13,6 @@ private:
 public:
     MultipleChoiceField(int fieldId, String fieldName, int num, ...)
     {
-
         mFieldId = fieldId;
         mFieldName = fieldName;
         mChoices = (String *)calloc(num, sizeof(String));
@@ -54,6 +53,11 @@ public:
                 return;
             }
         }
+    }
+
+    int getId()
+    {
+        return BasicField::getId();
     }
 };
 

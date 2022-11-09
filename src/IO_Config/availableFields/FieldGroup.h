@@ -8,11 +8,11 @@ class FieldGroup
 private:
     int mGroupId;
     String mGroupName;
-    BasicField *mFields;
+    BasicField **mFields;
     int mNofFields;
 
 public:
-    FieldGroup(int groupId, String groupName, BasicField *fields, int NofFields)
+    FieldGroup(int groupId, String groupName, BasicField **fields, int NofFields)
     {
         mGroupId = groupId;
         mGroupName = groupName;
@@ -25,9 +25,13 @@ public:
         return mGroupId;
     }
 
-    BasicField *getFields()
+    BasicField** getFields()
     {
         return mFields;
+    }
+
+    int getNofFields(){
+        return mNofFields;
     }
 };
 

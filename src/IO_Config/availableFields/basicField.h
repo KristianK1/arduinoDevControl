@@ -7,7 +7,8 @@ protected:
     int mFieldId;
     String mFieldName;
 
-    int getFieldId()
+public:
+    int getId()
     {
         return mFieldId;
     }

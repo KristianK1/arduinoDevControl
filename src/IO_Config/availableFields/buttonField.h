@@ -30,6 +30,11 @@ public:
     {
         mValue = value;
     }
+
+    int getId()
+    {
+        return BasicField::getId();
+    }
 };
 
 #endif

@@ -1,9 +1,9 @@
-#ifndef TEXT_FIELD_H
+ #ifndef TEXT_FIELD_H
 #define TEXT_FIELD_H
 
-#include"basicField.h"
+#include "basicField.h"
 
-class TextField: public BasicField
+class TextField : public BasicField
 {
 private:
     String mValue;
@@ -13,7 +13,7 @@ public:
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
-        
+
         mValue = value;
     }
 
@@ -21,7 +21,7 @@ public:
     {
     }
 
-    String getValue()
+    String getText()
     {
         return mValue;
     }
@@ -29,6 +29,11 @@ public:
     void setValue(String value)
     {
         mValue = value;
+    }
+    
+    int getId()
+    {
+        return BasicField::getId();
     }
 };
 

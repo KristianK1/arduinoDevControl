@@ -94,7 +94,7 @@ public:
         while (esp_websocket_client_is_connected(newHandle) == false && millis() - startedConnect < 10000)
         {
             delay(100);
-            Serial.println("connecting to WSS");
+            // Serial.println("connecting to WSS");
         }
         if (esp_websocket_client_is_connected(newHandle) == false)
         {

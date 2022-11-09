@@ -4,8 +4,9 @@
 #include "web\WifiConnection\WifiState.h"
 #include "web\APIrequests\HTTP.h"
 #include "web\WSSConnection\WS.h"
+#include "IO_Config/IO.h"
 
-class Device : WiFistate, HTTP, WS
+class Device : public WiFistate, HTTP, WS, IO
 {
 private:
     int tempTimer = millis();
@@ -40,6 +41,8 @@ public:
         }
 
         delay(500);
+        test();
+        delay(60 * 1000);
     }
 };
 
