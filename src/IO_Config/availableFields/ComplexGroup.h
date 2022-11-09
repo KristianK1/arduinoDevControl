@@ -118,16 +118,13 @@ public:
     {
         NofComplexGroups = n;
         mComplexGroups = (ComplexGroup **)calloc(n, sizeof(ComplexGroup *));
-        Serial.println("hello4");
         va_list arguments;
         va_start(arguments, n);
         for (int i = 0; i < n; i++)
         {
-            Serial.println(i);
             mComplexGroups[i] = va_arg(arguments, ComplexGroup *);
         }
         va_end(arguments);
-        Serial.println("hello5");
     }
 };
 

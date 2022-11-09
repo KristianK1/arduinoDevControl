@@ -69,7 +69,6 @@ public:
         va_start(arguments, n);
         for (int i = 0; i < n; i++)
         {
-            Serial.println(i);
             mFieldGroups[i] = va_arg(arguments, FieldGroup *);
         }
         va_end(arguments);

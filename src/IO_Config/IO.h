@@ -50,7 +50,7 @@ public:
                 int R = doc["data"]["value"]["R"];
                 int G = doc["data"]["value"]["G"];
                 int B = doc["data"]["value"]["B"];
-                changeFieldValue_RGB(groupId, fieldId, R, G, B);
+                changeFieldValue_rgb(groupId, fieldId, R, G, B);
             }
         }
         else if (strcmp(whatToAlter, "complexGroupState") == 0)
@@ -91,9 +91,47 @@ public:
         fieldAdd->setValue(value);
     }
 
-    void changeFieldValue_RGB(int groupId, int fieldId, int R, int G, int B)
+    void changeFieldValue_rgb(int groupId, int fieldId, int R, int G, int B)
     {
         BasicField *field = findFieldById(groupId, fieldId);
+        RGBField *fieldAdd = (RGBField *)field;
+        fieldAdd->setValue(R, G, B);
+    }
+
+    void changeComplexGroupState(int groupId, int stateId)
+    {
+        ComplexGroup *complexGroup = findComplexGroupById(groupId);
+        complexGroup->changeState(stateId);
+    }
+    ////////////////////
+    void changeFieldInComplexGroup_numeric(int groupId, int stateId, int fieldId, double value)
+    {
+        BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
+        NumericField *fieldAdd = (NumericField *)field;
+        fieldAdd->setValue(value);
+    }
+
+    void changeFieldInComplexGroup_text(int groupId, int stateId, int fieldId, String value)
+    {
+        BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
+        TextField *fieldAdd = (TextField *)field;
+        fieldAdd->setValue(value);
+    }
+    void changeFieldInComplexGroup_button(int groupId, int stateId, int fieldId, boolean value)
+    {
+        BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
+        ButtonField *fieldAdd = (ButtonField *)field;
+        fieldAdd->setValue(value);
+    }
+    void changeFieldInComplexGroup_multiple(int groupId, int stateId, int fieldId, int value)
+    {
+        BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
+        MultipleChoiceField *fieldAdd = (MultipleChoiceField *)field;
+        fieldAdd->setValue(value);
+    }
+    void changeFieldInComplexGroup_rgb(int groupId, int stateId, int fieldId, int R, int G, int B)
+    {
+        BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
         RGBField *fieldAdd = (RGBField *)field;
         fieldAdd->setValue(R, G, B);
     }
@@ -102,13 +140,10 @@ public:
 
     FieldGroup *findGroupById(int groupId)
     {
-        Serial.println("hello9");
         for (int i = 0; i < getNumberOfGroups(); i++)
         {
-            Serial.println("hello10");
             if (getFieldGroups()[i]->getGroupId() == groupId)
             {
-                Serial.println("hello11");
                 return getFieldGroups()[i];
             }
         }
@@ -116,16 +151,11 @@ public:
 
     BasicField *findFieldById(int groupId, int fieldId)
     {
-        Serial.println("hello8");
-
         FieldGroup *group = findGroupById(groupId);
         for (int i = 0; i < group->getNofFields(); i++)
         {
-            Serial.println("hello8.1");
-            Serial.println(group->getFields()[i]->getId());
             if (group->getFields()[i]->getId() == fieldId)
             {
-                Serial.println("hello8.2");
                 return group->getFields()[i];
             }
         }
@@ -171,30 +201,15 @@ public:
     void test()
     {
         setupFields();
-        {
-            Serial.println("hello7");
-            BasicField *field = findFieldById(0, 0);
-            Serial.println("hello99");
-            NumericField *fieldAdd = (NumericField *)field;
-            Serial.println(String(fieldAdd->getMin()));
-            Serial.println(String(fieldAdd->getMax()));
-            Serial.println(String(fieldAdd->getStep()));
-            fieldAdd->setValue(23);
-            Serial.println(String(fieldAdd->getValue()));
-        }
-        {
-            BasicField *field = findFieldinComplexGroup(1, 1, 0);
-            RGBField *fieldRGB = (RGBField *)field;
-            RGB stateToSet;
-            stateToSet.R = 25;
-            stateToSet.G = 35;
-            stateToSet.B = 45;
-            fieldRGB->setValue(stateToSet);
-            RGB state = fieldRGB->getValue();
-            Serial.println(state.R);
-            Serial.println(state.G);
-            Serial.println(state.B);
-        }
+        // {
+        //     BasicField *field = findFieldById(0, 0);
+        //     NumericField *fieldAdd = (NumericField *)field;
+        //     fieldAdd->setValue(23);
+        // }
+        // {
+        //     BasicField *field = findFieldinComplexGroup(1, 1, 0);
+        //     RGBField *fieldRGB = (RGBField *)field;
+        // }
     }
 };
 
