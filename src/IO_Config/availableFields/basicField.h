@@ -6,6 +6,7 @@ class BasicField
 protected:
     int mFieldId;
     String mFieldName;
+    void (*onChangeListener)(void);
 
 public:
     int getId()

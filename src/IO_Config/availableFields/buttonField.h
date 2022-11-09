@@ -9,12 +9,14 @@ private:
     boolean mValue;
 
 public:
-    ButtonField(int fieldId, String fieldName, boolean value)
+    ButtonField(int fieldId, String fieldName, boolean value, void func())
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
 
         mValue = value;
+
+        onChangeListener = func;
     }
 
     virtual ~ButtonField()

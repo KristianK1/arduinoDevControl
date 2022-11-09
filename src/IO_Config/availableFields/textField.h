@@ -1,4 +1,4 @@
- #ifndef TEXT_FIELD_H
+#ifndef TEXT_FIELD_H
 #define TEXT_FIELD_H
 
 #include "basicField.h"
@@ -9,12 +9,14 @@ private:
     String mValue;
 
 public:
-    TextField(int fieldId, String fieldName, String value)
+    TextField(int fieldId, String fieldName, String value, void func(void))
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
 
         mValue = value;
+
+        onChangeListener = func;
     }
 
     virtual ~TextField()
@@ -30,7 +32,7 @@ public:
     {
         mValue = value;
     }
-    
+
     int getId()
     {
         return BasicField::getId();

@@ -12,7 +12,7 @@ private:
     double mValue;
 
 public:
-    NumericField(int fieldId, String fieldName, double minValue, double maxValue, double step)
+    NumericField(int fieldId, String fieldName, double minValue, double maxValue, double step, void func(void))
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
@@ -21,6 +21,8 @@ public:
         mMaxValue = maxValue;
         mStep = step;
         mValue = minValue;
+
+        onChangeListener = func;
     }
 
     virtual ~NumericField() {}
@@ -48,6 +50,7 @@ public:
     void setValue(double value)
     {
         mValue = value;
+        onChangeListener();
     }
 
     int getId()

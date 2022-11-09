@@ -14,7 +14,7 @@ private:
     RGB mValue;
 
 public:
-    RGBField(int fieldId, String fieldName, RGB value)
+    RGBField(int fieldId, String fieldName, RGB value, void func())
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
@@ -22,9 +22,11 @@ public:
         mValue.B = value.R;
         mValue.G = value.G;
         mValue.B = value.B;
+
+        onChangeListener = func;
     }
 
-    RGBField(int fieldId, String fieldName, int R, int G, int B)
+    RGBField(int fieldId, String fieldName, int R, int G, int B, void func())
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
@@ -32,6 +34,8 @@ public:
         mValue.B = R;
         mValue.G = G;
         mValue.B = B;
+    
+        onChangeListener = func;
     }
 
     virtual ~RGBField()

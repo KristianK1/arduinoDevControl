@@ -11,13 +11,15 @@ private:
     int mValue;
 
 public:
-    MultipleChoiceField(int fieldId, String fieldName, int num, ...)
+    MultipleChoiceField(int fieldId, String fieldName, void func(), int num, ...)
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
         mChoices = (String *)calloc(num, sizeof(String));
         mValue = 0;
         NofChoices = num;
+
+        onChangeListener = func;
 
         va_list arguments;        // A place to store the list of arguments
         va_start(arguments, num); // Initializing arguments to store all values after num
