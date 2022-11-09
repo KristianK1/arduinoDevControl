@@ -19,13 +19,11 @@ public:
         mNofFields = NofFields;
         mFields = (BasicField **)calloc(mNofFields, sizeof(BasicField *));
 
-        Serial.println("FieldGroup constructor");
         va_list arguments;
         va_start(arguments, NofFields);
         for (int x = 0; x < mNofFields; x++)
         {
             mFields[x] = va_arg(arguments, BasicField *);
-            Serial.println(mFields[x]->getId());
         }
         va_end(arguments);
     }
@@ -67,7 +65,6 @@ public:
     {
         NofGroups = n;
         mFieldGroups = (FieldGroup **)calloc(n, sizeof(FieldGroup *));
-        Serial.println("hello4");
         va_list arguments;
         va_start(arguments, n);
         for (int i = 0; i < n; i++)
@@ -76,7 +73,6 @@ public:
             mFieldGroups[i] = va_arg(arguments, FieldGroup *);
         }
         va_end(arguments);
-        Serial.println("hello5");
     }
 };
 #endif

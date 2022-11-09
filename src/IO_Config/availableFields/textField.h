@@ -30,6 +30,7 @@ public:
 
     void setValue(String value)
     {
+        onChangeListener();
         mValue = value;
     }
 

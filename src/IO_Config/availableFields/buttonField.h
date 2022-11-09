@@ -30,6 +30,7 @@ public:
 
     void setValue(boolean value)
     {
+        onChangeListener();
         mValue = value;
     }
 

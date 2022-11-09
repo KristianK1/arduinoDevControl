@@ -98,6 +98,8 @@ public:
         fieldAdd->setValue(R, G, B);
     }
 
+    //////////////////////////////////////////////////////////////////////////////////
+
     FieldGroup *findGroupById(int groupId)
     {
         Serial.println("hello9");
@@ -129,6 +131,43 @@ public:
         }
     }
 
+    ComplexGroup *findComplexGroupById(int groupId)
+    {
+        for (int i = 0; i < getNumberOfComplexGroups(); i++)
+        {
+            if (getComplexGroups()[i]->getComplexGroupId() == groupId)
+            {
+                return getComplexGroups()[i];
+            }
+        }
+    }
+
+    ComplexGroupState *findComplexGroupState(int groupId, int stateId)
+    {
+        ComplexGroup *group = findComplexGroupById(groupId);
+        for (int i = 0; i < group->getNofStates(); i++)
+        {
+            if (group->getStates()[i]->getStateId() == stateId)
+            {
+                return group->getStates()[i];
+            }
+        }
+    }
+
+    BasicField *findFieldinComplexGroup(int groupId, int stateId, int fieldId)
+    {
+        ComplexGroupState *state = findComplexGroupState(groupId, stateId);
+        for (int i = 0; i < state->getNumberOfFields(); i++)
+        {
+            if (state->getFields()[i]->getId() == fieldId)
+            {
+                return state->getFields()[i];
+            }
+        }
+    }
+
+    ///////////////////////////////////////////////////////
+
     void test()
     {
         setupFields();
@@ -143,13 +182,19 @@ public:
             fieldAdd->setValue(23);
             Serial.println(String(fieldAdd->getValue()));
         }
-        // {
-        //     BasicField *field = findFieldById(0, 1);
-        //     NumericField *fieldAdd = (NumericField *)field;
-        //     Serial.println(String(fieldAdd->getMin()));
-        //     Serial.println(String(fieldAdd->getMax()));
-        //     Serial.println(String(fieldAdd->getStep()));
-        // }
+        {
+            BasicField *field = findFieldinComplexGroup(1, 1, 0);
+            RGBField *fieldRGB = (RGBField *)field;
+            RGB stateToSet;
+            stateToSet.R = 25;
+            stateToSet.G = 35;
+            stateToSet.B = 45;
+            fieldRGB->setValue(stateToSet);
+            RGB state = fieldRGB->getValue();
+            Serial.println(state.R);
+            Serial.println(state.G);
+            Serial.println(state.B);
+        }
     }
 };
 

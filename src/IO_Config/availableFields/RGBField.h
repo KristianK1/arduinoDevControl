@@ -49,6 +49,7 @@ public:
 
     void setValue(RGB value)
     {
+        onChangeListener();
         mValue = value;
     }
 

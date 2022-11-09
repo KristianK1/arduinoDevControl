@@ -40,8 +40,9 @@ public:
 
     void setValue(int value)
     {
-        if (value < NofChoices)
+        if (value >= 0 && value < NofChoices)
         {
+            onChangeListener();
             mValue = value;
         }
     }
