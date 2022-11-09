@@ -17,6 +17,7 @@ public:
         mFieldName = fieldName;
         mChoices = (String *)calloc(num, sizeof(String));
         mValue = 0;
+        NofChoices = num;
 
         va_list arguments;        // A place to store the list of arguments
         va_start(arguments, num); // Initializing arguments to store all values after num
@@ -30,7 +31,7 @@ public:
     {
     }
 
-    boolean getValue()
+    String getValue()
     {
         return mChoices[mValue];
     }

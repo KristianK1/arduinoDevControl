@@ -100,10 +100,13 @@ public:
 
     FieldGroup *findGroupById(int groupId)
     {
+        Serial.println("hello9");
         for (int i = 0; i < getNumberOfGroups(); i++)
         {
+            Serial.println("hello10");
             if (getFieldGroups()[i]->getGroupId() == groupId)
             {
+                Serial.println("hello11");
                 return getFieldGroups()[i];
             }
         }
@@ -111,11 +114,16 @@ public:
 
     BasicField *findFieldById(int groupId, int fieldId)
     {
+        Serial.println("hello8");
+
         FieldGroup *group = findGroupById(groupId);
         for (int i = 0; i < group->getNofFields(); i++)
         {
+            Serial.println("hello8.1");
+            Serial.println(group->getFields()[i]->getId());
             if (group->getFields()[i]->getId() == fieldId)
             {
+                Serial.println("hello8.2");
                 return group->getFields()[i];
             }
         }
@@ -125,7 +133,9 @@ public:
     {
         setupFields();
         {
-            BasicField *field = findFieldById(98, 0);
+            Serial.println("hello7");
+            BasicField *field = findFieldById(0, 0);
+            Serial.println("hello99");
             NumericField *fieldAdd = (NumericField *)field;
             Serial.println(String(fieldAdd->getMin()));
             Serial.println(String(fieldAdd->getMax()));

@@ -17,12 +17,16 @@ public:
         mGroupId = groupId;
         mGroupName = groupName;
         mNofFields = NofFields;
-        mFields = (BasicField **)calloc(NofFields, sizeof(BasicField *));
+        mFields = (BasicField **)calloc(mNofFields, sizeof(BasicField *));
 
+        Serial.println("FieldGroup constructor");
         va_list arguments;
         va_start(arguments, NofFields);
-        for (int i = 0; i < NofFields; i++)
-            mFields[i] = va_arg(arguments, BasicField *);
+        for (int x = 0; x < mNofFields; x++)
+        {
+            mFields[x] = va_arg(arguments, BasicField *);
+            Serial.println(mFields[x]->getId());
+        }
         va_end(arguments);
     }
 
@@ -61,12 +65,18 @@ public:
 
     void createGroups(int n, ...)
     {
-        mFieldGroups = (FieldGroup **)calloc(NofGroups, sizeof(FieldGroup *));
+        NofGroups = n;
+        mFieldGroups = (FieldGroup **)calloc(n, sizeof(FieldGroup *));
+        Serial.println("hello4");
         va_list arguments;
         va_start(arguments, n);
         for (int i = 0; i < n; i++)
+        {
+            Serial.println(i);
             mFieldGroups[i] = va_arg(arguments, FieldGroup *);
+        }
         va_end(arguments);
+        Serial.println("hello5");
     }
 };
 #endif
