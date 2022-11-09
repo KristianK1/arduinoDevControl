@@ -100,11 +100,11 @@ public:
 
     FieldGroup *findGroupById(int groupId)
     {
-        for (int i = 0; i < NofGroups; i++)
+        for (int i = 0; i < getNumberOfGroups(); i++)
         {
-            if (mFieldGroups[i]->getGroupId() == groupId)
+            if (getFieldGroups()[i]->getGroupId() == groupId)
             {
-                return mFieldGroups[i];
+                return getFieldGroups()[i];
             }
         }
     }

@@ -12,12 +12,18 @@ private:
     int mNofFields;
 
 public:
-    FieldGroup(int groupId, String groupName, BasicField **fields, int NofFields)
+    FieldGroup(int groupId, String groupName, int NofFields, ...)
     {
         mGroupId = groupId;
         mGroupName = groupName;
-        mFields = fields;
         mNofFields = NofFields;
+        mFields = (BasicField **)calloc(NofFields, sizeof(BasicField *));
+
+        va_list arguments;
+        va_start(arguments, NofFields);
+        for (int i = 0; i < NofFields; i++)
+            mFields[i] = va_arg(arguments, BasicField *);
+        va_end(arguments);
     }
 
     int getGroupId()
@@ -25,14 +31,42 @@ public:
         return mGroupId;
     }
 
-    BasicField** getFields()
+    BasicField **getFields()
     {
         return mFields;
     }
 
-    int getNofFields(){
+    int getNofFields()
+    {
         return mNofFields;
     }
 };
 
+class FieldGroups
+{
+private:
+    FieldGroup **mFieldGroups;
+    int NofGroups;
+
+public:
+    FieldGroup **getFieldGroups()
+    {
+        return mFieldGroups;
+    }
+
+    int getNumberOfGroups()
+    {
+        return NofGroups;
+    }
+
+    void createGroups(int n, ...)
+    {
+        mFieldGroups = (FieldGroup **)calloc(NofGroups, sizeof(FieldGroup *));
+        va_list arguments;
+        va_start(arguments, n);
+        for (int i = 0; i < n; i++)
+            mFieldGroups[i] = va_arg(arguments, FieldGroup *);
+        va_end(arguments);
+    }
+};
 #endif
