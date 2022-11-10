@@ -9,14 +9,33 @@ private:
     String mValue;
 
 public:
-    TextField(int fieldId, String fieldName, String value, void func(void))
+    TextField(int fieldId, String fieldName, int direction, String value, void func(void))
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
+        mFieldDirection = direction;
+        onChangeListener = func;
 
         mValue = value;
 
-        onChangeListener = func;
+        DynamicJsonDocument doc(1024);
+        doc["id"] = mFieldId;
+        doc["fieldName"] = mFieldName;
+        doc["fieldType"] = "text";
+
+        doc["fieldValue"] = mValue;
+        if (direction == INPUT_FIELD)
+        {
+            doc["fieldDirection"] = "input";
+        }
+        else if (direction == OUTPUT_FIELD)
+        {
+            doc["fieldDirection"] = "output";
+        }
+
+        String myString;
+        serializeJson(doc, myString);
+        fieldInformation = myString;
     }
 
     virtual ~TextField()

@@ -10,6 +10,7 @@ private:
     String mStateName;
     BasicField **mFields;
     int nOfFields;
+    String complexGroupStateInfo;
 
 public:
     ComplexGroupState(int stateId, String stateName, int n, ...)
@@ -26,12 +27,26 @@ public:
             mFields[x] = va_arg(arguments, BasicField *);
         }
         va_end(arguments);
+
+        String info;
+        info = "{\"id\":" + String(mStateId) + ", \"stateName\":\"" + mStateName + "\",\"fields\":[";
+        for (int i = 0; i < nOfFields; i++)
+        {
+            info = info + mFields[i]->getFieldInfo();
+            if (i != nOfFields - 1)
+            {
+                info = info + ",";
+            }
+        }
+        info = info + "]}";
+        complexGroupStateInfo = info;
     }
 
-    int getStateId(){
+    int getStateId()
+    {
         return mStateId;
     }
-    
+
     BasicField **getFields()
     {
         return mFields;
@@ -40,6 +55,11 @@ public:
     int getNumberOfFields()
     {
         return nOfFields;
+    }
+
+    String getInfo()
+    {
+        return complexGroupStateInfo;
     }
 };
 
@@ -52,6 +72,7 @@ private:
     int mNofStates;
     void (*onStateChangeListener)(void);
     int currentState;
+    String complexGroupInfo;
 
 public:
     ComplexGroup(int groupId, String groupName, void func(), int n, ...)
@@ -70,6 +91,18 @@ public:
             mStates[x] = va_arg(arguments, ComplexGroupState *);
         }
         va_end(arguments);
+
+        String info = "{\"id\":" + String(mGroupId) + ",\"groupName\":\"" + mGroupName + "\",\"fieldGroupStates\":[";
+        for (int i = 0; i < mNofStates; i++)
+        {
+            info = info + mStates[i]->getInfo();
+            if (i != mNofStates - 1)
+            {
+                info = info + ",";
+            }
+        }
+        info = info + "]}";
+        complexGroupInfo = info;
     }
 
     int getComplexGroupId()
@@ -91,9 +124,14 @@ public:
         return mStates;
     }
 
-        int getNofStates()
+    int getNofStates()
     {
         return mNofStates;
+    }
+
+    String getInfo()
+    {
+        return complexGroupInfo;
     }
 };
 
@@ -102,6 +140,7 @@ class ComplexGroups
 private:
     ComplexGroup **mComplexGroups;
     int NofComplexGroups;
+    String information;
 
 public:
     ComplexGroup **getComplexGroups()
@@ -125,6 +164,24 @@ public:
             mComplexGroups[i] = va_arg(arguments, ComplexGroup *);
         }
         va_end(arguments);
+
+        String info;
+        info = "[";
+        for (int i = 0; i < NofComplexGroups; i++)
+        {
+            info = info + mComplexGroups[i]->getInfo();
+            if (i != NofComplexGroups - 1)
+            {
+                info = info + ",";
+            }
+        }
+        info = info + "]";
+        information = info;
+    }
+
+    String getInfo()
+    {
+        return information;
     }
 };
 

@@ -18,12 +18,27 @@ public:
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
+        mFieldDirection = INPUT_FIELD;
+        onChangeListener = func;
 
-        mValue.B = value.R;
+        mValue.R = value.R;
         mValue.G = value.G;
         mValue.B = value.B;
 
-        onChangeListener = func;
+        DynamicJsonDocument doc(1024);
+        doc["id"] = mFieldId;
+        doc["fieldName"] = mFieldName;
+        doc["fieldType"] = "RGB";
+
+        doc["fieldValue"]["R"] = mValue.R;
+        doc["fieldValue"]["G"] = mValue.G;
+        doc["fieldValue"]["B"] = mValue.B;
+
+        doc["fieldDirection"] = "input";
+
+        String myString;
+        serializeJson(doc, myString);
+        fieldInformation = myString;
     }
 
     RGBField(int fieldId, String fieldName, int R, int G, int B, void func())
@@ -31,11 +46,26 @@ public:
         mFieldId = fieldId;
         mFieldName = fieldName;
 
-        mValue.B = R;
+        onChangeListener = func;
+
+        mValue.R = R;
         mValue.G = G;
         mValue.B = B;
-    
-        onChangeListener = func;
+
+        DynamicJsonDocument doc(1024);
+        doc["id"] = mFieldId;
+        doc["fieldName"] = mFieldName;
+        doc["fieldType"] = "RGB";
+
+        doc["fieldValue"]["R"] = mValue.R;
+        doc["fieldValue"]["G"] = mValue.G;
+        doc["fieldValue"]["B"] = mValue.B;
+
+        doc["fieldDirection"] = "input";
+
+        String myString;
+        serializeJson(doc, myString);
+        fieldInformation = myString;
     }
 
     virtual ~RGBField()

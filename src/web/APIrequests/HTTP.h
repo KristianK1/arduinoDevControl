@@ -55,8 +55,6 @@ public:
         else
         {
             result.success = false;
-            result.payload = http.getString();
-            Serial.println(result.payload);
         }
         http.end();
         return result;

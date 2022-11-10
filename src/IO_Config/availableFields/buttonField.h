@@ -9,14 +9,33 @@ private:
     boolean mValue;
 
 public:
-    ButtonField(int fieldId, String fieldName, boolean value, void func())
+    ButtonField(int fieldId, String fieldName, int direction, boolean value, void func())
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
+        mFieldDirection = direction;
+        onChangeListener = func;
 
         mValue = value;
 
-        onChangeListener = func;
+        DynamicJsonDocument doc(1024);
+        doc["id"] = mFieldId;
+        doc["fieldName"] = mFieldName;
+        doc["fieldType"] = "button";
+
+        doc["fieldValue"] = mValue;
+        if (direction == INPUT_FIELD)
+        {
+            doc["fieldDirection"] = "input";
+        }
+        else if (direction == OUTPUT_FIELD)
+        {
+            doc["fieldDirection"] = "output";
+        }
+        
+        String myString;
+        serializeJson(doc, myString);
+        fieldInformation = myString;
     }
 
     virtual ~ButtonField()

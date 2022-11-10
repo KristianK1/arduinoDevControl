@@ -11,15 +11,16 @@ private:
     int mValue;
 
 public:
-    MultipleChoiceField(int fieldId, String fieldName, void func(), int num, ...)
+    MultipleChoiceField(int fieldId, String fieldName, int direction, void func(), int num, ...)
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
-        mChoices = (String *)calloc(num, sizeof(String));
-        mValue = 0;
-        NofChoices = num;
-
+        mFieldDirection = direction;
         onChangeListener = func;
+
+        mChoices = (String *)calloc(num, sizeof(String));
+        NofChoices = num;
+        mValue = 0;
 
         va_list arguments;        // A place to store the list of arguments
         va_start(arguments, num); // Initializing arguments to store all values after num
@@ -27,6 +28,30 @@ public:
         for (int x = 0; x < num; x++)
             mChoices[x] = va_arg(arguments, char *); // Adds the next value in argument list to sum.
         va_end(arguments);
+
+        DynamicJsonDocument doc(1024);
+        doc["id"] = mFieldId;
+        doc["fieldName"] = mFieldName;
+        doc["fieldType"] = "multipleChoice";
+
+        for (int i = 0; i < NofChoices; i++)
+        {
+            doc["values"][i] = mChoices[i];
+        }
+
+        doc["fieldValue"] = mValue;
+        if (direction == INPUT_FIELD)
+        {
+            doc["fieldDirection"] = "input";
+        }
+        else if (direction == OUTPUT_FIELD)
+        {
+            doc["fieldDirection"] = "output";
+        }
+
+        String myString;
+        serializeJson(doc, myString);
+        fieldInformation = myString;
     }
 
     virtual ~MultipleChoiceField()

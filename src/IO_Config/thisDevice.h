@@ -20,7 +20,8 @@ void group0field0_changed__H()
     Serial.println("0-0 changed ___H");
 }
 
-void RGBchanged(){
+void RGBchanged()
+{
     Serial.println("changeddddddddddd - func pointer works");
 }
 
@@ -40,13 +41,13 @@ public:
             new NumericField(2, "field2", -1.0, 25.0, 1.0, group0field0_changed);
 
         BasicField *field3 =
-            new TextField(3, "field3", "23 deg C", group0field0_changed);
+            new TextField(3, "field3", INPUT_FIELD, "23 deg C", group0field0_changed);
 
         BasicField *field4 =
-            new MultipleChoiceField(4, "field4", group0field0_changed, 4, "OFF", "ANIMACIJA 1", "ANIMACIJA 2", "ANIMACIJA 3");
+            new MultipleChoiceField(4, "field4", INPUT_FIELD, group0field0_changed, 4, "OFF", "ANIMACIJA 1", "ANIMACIJA 2", "ANIMACIJA 3");
 
         BasicField *field5 =
-            new ButtonField(5, "field5", false, group0field0_changed);
+            new ButtonField(5, "field5", INPUT_FIELD, false, group0field0_changed);
 
         BasicField *field6 =
             new RGBField(6, "field6", 0, 0, 0, group0field0_changed);
@@ -65,13 +66,13 @@ public:
             new NumericField(2, "field2", -1.0, 25.0, 1.0, group0field0_changed);
 
         BasicField *field13 =
-            new TextField(3, "field3", "23 deg C", group0field0_changed);
+            new TextField(3, "field3", INPUT_FIELD, "23 deg C", group0field0_changed);
 
         BasicField *field14 =
-            new MultipleChoiceField(4, "field4", group0field0_changed, 3, "OFF", "ANIMACIJA 1", "ANIMACIJA 2");
+            new MultipleChoiceField(4, "field4", INPUT_FIELD, group0field0_changed, 3, "OFF", "ANIMACIJA 1", "ANIMACIJA 2");
 
         BasicField *field15 =
-            new ButtonField(5, "field5", false, group0field0_changed);
+            new ButtonField(5, "field5", INPUT_FIELD, false, group0field0_changed);
 
         BasicField *field16 =
             new RGBField(6, "field6", 0, 0, 0, group0field0_changed);
@@ -109,7 +110,7 @@ public:
             new ComplexGroupState(1, "rgb", 1, fieldRGB);
 
         BasicField *animationsF =
-            new MultipleChoiceField(0, "animations", group0field0_changed, 5, "OFF", "A1", "A2", "A3", "A4");
+            new MultipleChoiceField(0, "animations", INPUT_FIELD, group0field0_changed, 5, "OFF", "A1", "A2", "A3", "A4");
 
         ComplexGroupState *state3 =
             new ComplexGroupState(2, "animations", 1, animationsF);
@@ -138,7 +139,7 @@ public:
             new ComplexGroupState(1, "rgb", 1, fieldRGB_x);
         ////////////////////
         BasicField *animationsF_x =
-            new MultipleChoiceField(0, "animations", group0field0_changed, 5, "OFF", "A1", "A2", "A3", "A4");
+            new MultipleChoiceField(0, "animations", INPUT_FIELD, group0field0_changed, 5, "OFF", "A1", "A2", "A3", "A4");
 
         ComplexGroupState *state3_x =
             new ComplexGroupState(2, "animations", 1, animationsF_x);

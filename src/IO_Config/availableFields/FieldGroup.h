@@ -10,6 +10,7 @@ private:
     String mGroupName;
     BasicField **mFields;
     int mNofFields;
+    String groupInformation;
 
 public:
     FieldGroup(int groupId, String groupName, int NofFields, ...)
@@ -26,6 +27,18 @@ public:
             mFields[x] = va_arg(arguments, BasicField *);
         }
         va_end(arguments);
+
+        String info = "{\"id\":" + String(mGroupId) + ",\"groupName\":\"" + mGroupName + "\",\"fields\":[";
+        for (int i = 0; i < mNofFields; i++)
+        {
+            info = info + mFields[i]->getFieldInfo();
+            if (i != mNofFields - 1)
+            {
+                info = info + ",";
+            }
+        }
+        info = info + "]}";
+        groupInformation = info;
     }
 
     int getGroupId()
@@ -42,6 +55,11 @@ public:
     {
         return mNofFields;
     }
+
+    String getInfo()
+    {
+        return groupInformation;
+    }
 };
 
 class FieldGroups
@@ -49,6 +67,7 @@ class FieldGroups
 private:
     FieldGroup **mFieldGroups;
     int NofGroups;
+    String information;
 
 public:
     FieldGroup **getFieldGroups()
@@ -72,6 +91,23 @@ public:
             mFieldGroups[i] = va_arg(arguments, FieldGroup *);
         }
         va_end(arguments);
+
+        String info = "[";
+        for (int i = 0; i < NofGroups; i++)
+        {
+            info = info + mFieldGroups[i]->getInfo();
+            if (i != NofGroups - 1)
+            {
+                info = info + ",";
+            }
+        }
+        info = info + "]";
+        information = info;
+    }
+
+    String getInfo()
+    {
+        return information;
     }
 };
 #endif

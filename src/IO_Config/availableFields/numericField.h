@@ -16,13 +16,29 @@ public:
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
+        mFieldDirection = INPUT_FIELD;
+        onChangeListener = func;
 
         mMinValue = minValue;
         mMaxValue = maxValue;
         mStep = step;
         mValue = minValue;
 
-        onChangeListener = func;
+        DynamicJsonDocument doc(1024);
+        doc["id"] = mFieldId;
+        doc["fieldName"] = mFieldName;
+        doc["fieldType"] = "numeric";
+
+        doc["fieldValue"] = mValue;
+        doc["minValue"] = mMinValue;
+        doc["maxValue"] = mMaxValue;
+        doc["valueStep"] = mStep;
+
+        doc["fieldDirection"] = "input";
+
+        String myString;
+        serializeJson(doc, myString);
+        fieldInformation = myString;
     }
 
     virtual ~NumericField() {}

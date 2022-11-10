@@ -5,12 +5,35 @@
 #include "thisDevice.h"
 #include <typeinfo>
 
+#include "../deviceKey.h"
+
 class IO : public ThisDevice
 {
 private:
+    String information;
+
 public:
     void loop()
     {
+    }
+
+    String getTotalDeviceString()
+    {
+        String info = "{\"deviceKey\":\"" + deviceKey + "\"";
+
+        if (getNumberOfGroups() > 0)
+        {
+            info = info + ",";
+            info = info + "\"deviceFieldGroups\":" + FieldGroups::getInfo();
+        }
+        if (getNumberOfComplexGroups() > 0)
+        {
+            info = info + ",";
+            info = info + "\"deviceFieldComplexGroups\":" + ComplexGroups::getInfo();
+        }
+        info = info + "}";
+        Serial.println(info);
+        return info;
     }
 
     void reciveData(String data)
@@ -147,11 +170,17 @@ public:
                 return getFieldGroups()[i];
             }
         }
+        return NULL;
     }
 
     BasicField *findFieldById(int groupId, int fieldId)
     {
         FieldGroup *group = findGroupById(groupId);
+        if (group == NULL)
+        {
+            return NULL;
+        }
+
         for (int i = 0; i < group->getNofFields(); i++)
         {
             if (group->getFields()[i]->getId() == fieldId)
@@ -159,7 +188,10 @@ public:
                 return group->getFields()[i];
             }
         }
+        return NULL;
     }
+
+    /////////////////
 
     ComplexGroup *findComplexGroupById(int groupId)
     {
@@ -170,11 +202,17 @@ public:
                 return getComplexGroups()[i];
             }
         }
+        return NULL;
     }
 
     ComplexGroupState *findComplexGroupState(int groupId, int stateId)
     {
         ComplexGroup *group = findComplexGroupById(groupId);
+        if (group == NULL)
+        {
+            return NULL;
+        }
+
         for (int i = 0; i < group->getNofStates(); i++)
         {
             if (group->getStates()[i]->getStateId() == stateId)
@@ -182,11 +220,17 @@ public:
                 return group->getStates()[i];
             }
         }
+        return NULL;
     }
 
     BasicField *findFieldinComplexGroup(int groupId, int stateId, int fieldId)
     {
         ComplexGroupState *state = findComplexGroupState(groupId, stateId);
+        if (state == NULL)
+        {
+            return NULL;
+        }
+
         for (int i = 0; i < state->getNumberOfFields(); i++)
         {
             if (state->getFields()[i]->getId() == fieldId)
@@ -194,6 +238,7 @@ public:
                 return state->getFields()[i];
             }
         }
+        return NULL;
     }
 
     ///////////////////////////////////////////////////////
@@ -201,6 +246,7 @@ public:
     void test()
     {
         setupFields();
+        getTotalDeviceString();
         // {
         //     BasicField *field = findFieldById(0, 0);
         //     NumericField *fieldAdd = (NumericField *)field;
