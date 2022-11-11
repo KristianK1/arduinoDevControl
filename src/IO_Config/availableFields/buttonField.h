@@ -3,6 +3,8 @@
 
 #include "basicField.h"
 
+#include "ArduinoJson.h"
+
 class ButtonField : public BasicField
 {
 private:
@@ -14,6 +16,7 @@ public:
         mFieldId = fieldId;
         mFieldName = fieldName;
         mFieldDirection = direction;
+        mFieldType = "button";
         onChangeListener = func;
 
         mValue = value;
@@ -21,18 +24,18 @@ public:
         DynamicJsonDocument doc(1024);
         doc["id"] = mFieldId;
         doc["fieldName"] = mFieldName;
-        doc["fieldType"] = "button";
+        doc["fieldType"] = mFieldType;
 
-        doc["fieldValue"] = mValue;
+        doc["fieldValue"]["fieldValue"] = mValue;
         if (direction == INPUT_FIELD)
         {
-            doc["fieldDirection"] = "input";
+            doc["fieldValue"]["fieldDirection"] = "input";
         }
         else if (direction == OUTPUT_FIELD)
         {
-            doc["fieldDirection"] = "output";
+            doc["fieldValue"]["fieldDirection"] = "output";
         }
-        
+
         String myString;
         serializeJson(doc, myString);
         fieldInformation = myString;

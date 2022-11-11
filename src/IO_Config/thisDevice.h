@@ -145,7 +145,7 @@ public:
             new ComplexGroupState(2, "animations", 1, animationsF_x);
         ///////////////////
         ComplexGroup *group2 =
-            new ComplexGroup(1, "complexGroup1", group0field0_changed, 3, state1_x, state2_x, state3_x);
+            new ComplexGroup(1, "complexGroup1_new", group0field0_changed, 3, state1_x, state2_x, state3_x);
 
         createComplexGroups(2, group1, group2);
     }

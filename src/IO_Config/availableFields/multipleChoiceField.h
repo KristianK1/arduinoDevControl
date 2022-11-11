@@ -3,6 +3,8 @@
 
 #include "basicField.h"
 
+#include "ArduinoJson.h"
+
 class MultipleChoiceField : public BasicField
 {
 private:
@@ -16,6 +18,7 @@ public:
         mFieldId = fieldId;
         mFieldName = fieldName;
         mFieldDirection = direction;
+        mFieldType = "multipleChoice";
         onChangeListener = func;
 
         mChoices = (String *)calloc(num, sizeof(String));
@@ -32,21 +35,21 @@ public:
         DynamicJsonDocument doc(1024);
         doc["id"] = mFieldId;
         doc["fieldName"] = mFieldName;
-        doc["fieldType"] = "multipleChoice";
+        doc["fieldValue"]["fieldType"] = mFieldType;
 
         for (int i = 0; i < NofChoices; i++)
         {
-            doc["values"][i] = mChoices[i];
+            doc["fieldValue"]["values"][i] = mChoices[i];
         }
 
-        doc["fieldValue"] = mValue;
+        doc["fieldValue"]["fieldValue"] = mValue;
         if (direction == INPUT_FIELD)
         {
-            doc["fieldDirection"] = "input";
+            doc["fieldValue"]["fieldDirection"] = "input";
         }
         else if (direction == OUTPUT_FIELD)
         {
-            doc["fieldDirection"] = "output";
+            doc["fieldValue"]["fieldDirection"] = "output";
         }
 
         String myString;

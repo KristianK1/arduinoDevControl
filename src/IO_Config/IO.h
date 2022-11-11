@@ -32,7 +32,7 @@ public:
             info = info + "\"deviceFieldComplexGroups\":" + ComplexGroups::getInfo();
         }
         info = info + "}";
-        Serial.println(info);
+        // Serial.println(info);
         return info;
     }
 
@@ -246,7 +246,7 @@ public:
     void test()
     {
         setupFields();
-        getTotalDeviceString();
+        // getTotalDeviceString();
         // {
         //     BasicField *field = findFieldById(0, 0);
         //     NumericField *fieldAdd = (NumericField *)field;

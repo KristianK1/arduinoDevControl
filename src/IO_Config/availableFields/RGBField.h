@@ -3,6 +3,8 @@
 
 #include "basicField.h"
 
+#include "ArduinoJson.h"
+
 typedef struct rgb
 {
     int R, G, B; // [0,255] ?
@@ -19,6 +21,7 @@ public:
         mFieldId = fieldId;
         mFieldName = fieldName;
         mFieldDirection = INPUT_FIELD;
+        mFieldType = "RGB";
         onChangeListener = func;
 
         mValue.R = value.R;
@@ -28,13 +31,13 @@ public:
         DynamicJsonDocument doc(1024);
         doc["id"] = mFieldId;
         doc["fieldName"] = mFieldName;
-        doc["fieldType"] = "RGB";
+        doc["fieldType"] = mFieldType;
 
         doc["fieldValue"]["R"] = mValue.R;
         doc["fieldValue"]["G"] = mValue.G;
         doc["fieldValue"]["B"] = mValue.B;
 
-        doc["fieldDirection"] = "input";
+        doc["fieldValue"]["fieldDirection"] = "input";
 
         String myString;
         serializeJson(doc, myString);

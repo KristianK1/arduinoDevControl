@@ -4,7 +4,7 @@
 #include "web\WifiConnection\WifiState.h"
 #include "web\APIrequests\HTTP.h"
 #include "web\WSSConnection\WS.h"
-#include "IO_Config/IO.h"
+#include "IO_Config\IO.h"
 
 class Device : public WiFistate, HTTP, WS, IO
 {
@@ -37,12 +37,22 @@ public:
             //         Serial.println(result.payload);
             //     }
             // }
-            WS::connectAndMaintainConnection();
+
+            // WS::connectAndMaintainConnection();
         }
 
         delay(500);
-        test();
+        IO::setupFields();
+        registerDevice();
         delay(60 * 1000);
+
+    }
+
+    void registerDevice()
+    {
+        String data = IO::getTotalDeviceString();
+        Serial.println(data);
+        HTTP::post("API/device/registerDeviceData", data);
     }
 };
 

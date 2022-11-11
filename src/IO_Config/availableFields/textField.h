@@ -3,6 +3,8 @@
 
 #include "basicField.h"
 
+#include "ArduinoJson.h"
+
 class TextField : public BasicField
 {
 private:
@@ -14,6 +16,7 @@ public:
         mFieldId = fieldId;
         mFieldName = fieldName;
         mFieldDirection = direction;
+        mFieldType = "text";
         onChangeListener = func;
 
         mValue = value;
@@ -23,14 +26,14 @@ public:
         doc["fieldName"] = mFieldName;
         doc["fieldType"] = "text";
 
-        doc["fieldValue"] = mValue;
+        doc["fieldValue"]["fieldValue"] = mValue;
         if (direction == INPUT_FIELD)
         {
-            doc["fieldDirection"] = "input";
+            doc["fieldValue"]["fieldDirection"] = "input";
         }
         else if (direction == OUTPUT_FIELD)
         {
-            doc["fieldDirection"] = "output";
+            doc["fieldValue"]["fieldDirection"] = "output";
         }
 
         String myString;

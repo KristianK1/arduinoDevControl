@@ -3,6 +3,8 @@
 
 #include "basicField.h"
 
+#include "ArduinoJson.h"
+
 class NumericField : public BasicField
 {
 private:
@@ -17,6 +19,7 @@ public:
         mFieldId = fieldId;
         mFieldName = fieldName;
         mFieldDirection = INPUT_FIELD;
+        mFieldType = "numeric";
         onChangeListener = func;
 
         mMinValue = minValue;
@@ -27,14 +30,14 @@ public:
         DynamicJsonDocument doc(1024);
         doc["id"] = mFieldId;
         doc["fieldName"] = mFieldName;
-        doc["fieldType"] = "numeric";
+        doc["fieldType"] = mFieldType;
 
-        doc["fieldValue"] = mValue;
-        doc["minValue"] = mMinValue;
-        doc["maxValue"] = mMaxValue;
-        doc["valueStep"] = mStep;
+        doc["fieldValue"]["fieldValue"] = mValue;
+        doc["fieldValue"]["minValue"] = mMinValue;
+        doc["fieldValue"]["maxValue"] = mMaxValue;
+        doc["fieldValue"]["valueStep"] = mStep;
 
-        doc["fieldDirection"] = "input";
+        doc["fieldValue"]["fieldDirection"] = "input";
 
         String myString;
         serializeJson(doc, myString);

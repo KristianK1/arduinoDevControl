@@ -13,6 +13,7 @@ protected:
     
     int mFieldDirection; //INPUT OR OUTPUT
     String fieldInformation;
+    String mFieldType;
 
 public:
     int getId()
@@ -22,6 +23,10 @@ public:
 
     String getFieldInfo(){
         return fieldInformation;
+    }
+
+    String getFieldType(){
+        return mFieldType;
     }
 };
 
