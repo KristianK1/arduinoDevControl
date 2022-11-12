@@ -35,7 +35,7 @@ public:
         DynamicJsonDocument doc(1024);
         doc["id"] = mFieldId;
         doc["fieldName"] = mFieldName;
-        doc["fieldValue"]["fieldType"] = mFieldType;
+        doc["fieldType"] = mFieldType;
 
         for (int i = 0; i < NofChoices; i++)
         {

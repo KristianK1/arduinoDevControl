@@ -64,7 +64,7 @@ public:
         doc["fieldValue"]["G"] = mValue.G;
         doc["fieldValue"]["B"] = mValue.B;
 
-        doc["fieldDirection"] = "input";
+        doc["fieldValue"]["fieldDirection"] = "input";
 
         String myString;
         serializeJson(doc, myString);

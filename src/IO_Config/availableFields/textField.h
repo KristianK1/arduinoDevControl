@@ -24,7 +24,7 @@ public:
         DynamicJsonDocument doc(1024);
         doc["id"] = mFieldId;
         doc["fieldName"] = mFieldName;
-        doc["fieldType"] = "text";
+        doc["fieldType"] = mFieldType;
 
         doc["fieldValue"]["fieldValue"] = mValue;
         if (direction == INPUT_FIELD)

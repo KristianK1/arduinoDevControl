@@ -38,7 +38,7 @@ public:
             new NumericField(1, "field1", -1.0, 25.0, 1.0, group0field0_changed);
 
         BasicField *field2 =
-            new NumericField(2, "field2", -1.0, 25.0, 1.0, group0field0_changed);
+            new NumericField(2, "field2", -1.0, 25.0, 0.5, group0field0_changed);
 
         BasicField *field3 =
             new TextField(3, "field3", INPUT_FIELD, "23 deg C", group0field0_changed);
