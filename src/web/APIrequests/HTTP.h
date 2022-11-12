@@ -44,7 +44,7 @@ public:
         HTTPresult result;
         String fullLink = basicLink + sublink;
         http.begin(fullLink.c_str());
-        http.addHeader("Content-Type", "text/html; charset=utf-8");
+        http.addHeader("Content-Type", "application/json");
         int responseCode = http.POST(body);
         if (responseCode > 0)
         {

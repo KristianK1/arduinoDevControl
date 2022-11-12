@@ -52,8 +52,17 @@ public:
         BasicField *field6 =
             new RGBField(6, "field6", 0, 0, 0, group0field0_changed);
 
+        BasicField *field7 =
+            new ButtonField(7, "field7", INPUT_FIELD, true, group0field0_changed);
+
+        BasicField *field8 =
+            new ButtonField(8, "field8", INPUT_FIELD, true, group0field0_changed);
+
+        BasicField *field9 =
+            new ButtonField(9, "field9", INPUT_FIELD, true, group0field0_changed);
+
         FieldGroup *fieldGroup1 =
-            new FieldGroup(0, "group1", 7, field0, field1, field2, field3, field4, field5, field6);
+            new FieldGroup(0, "group1", 9, field0, field1, field2, field3, field4, field5, field6, field7, field8);
         //////////////////////////////////////////////
 
         BasicField *field10 =
