@@ -28,6 +28,19 @@ public:
         }
         va_end(arguments);
 
+        for (int i = 0; i < NofFields; i++)
+        {
+            for (int j = i + 1; j < NofFields; j++)
+            {
+                if (mFields[i]->getId() > mFields[j]->getId())
+                {
+                    BasicField *swap = mFields[i];
+                    mFields[i] = mFields[j];
+                    mFields[j] = swap;
+                }
+            }
+        }
+
         String info = "{\"id\":" + String(mGroupId) + ",\"groupName\":\"" + mGroupName + "\",\"fields\":[";
         for (int i = 0; i < mNofFields; i++)
         {
@@ -91,6 +104,19 @@ public:
             mFieldGroups[i] = va_arg(arguments, FieldGroup *);
         }
         va_end(arguments);
+
+        for (int i = 0; i < NofGroups; i++)
+        {
+            for (int j = i + 1; j < NofGroups; j++)
+            {
+                if (mFieldGroups[i]->getGroupId() > mFieldGroups[j]->getGroupId())
+                {
+                    FieldGroup *swap = mFieldGroups[i];
+                    mFieldGroups[i] = mFieldGroups[j];
+                    mFieldGroups[j] = swap;
+                }
+            }
+        }
 
         String info = "[";
         for (int i = 0; i < NofGroups; i++)

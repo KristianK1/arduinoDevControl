@@ -32,7 +32,7 @@ public:
     {
         ///////////////////////////////////////////////
         BasicField *field0 =
-            new NumericField(0, "field0", -1.0, 25.0, 1.0, group0field0_changed__H);
+            new NumericField(50, "field0", -1.0, 25.0, 1.0, group0field0_changed__H);
 
         BasicField *field1 =
             new NumericField(1, "field1", -1.0, 25.0, 1.0, group0field0_changed);
@@ -59,10 +59,10 @@ public:
             new ButtonField(8, "field8", INPUT_FIELD, true, group0field0_changed);
 
         BasicField *field9 =
-            new ButtonField(9, "field9", INPUT_FIELD, true, group0field0_changed);
+            new ButtonField(99, "field9", INPUT_FIELD, true, group0field0_changed);
 
         FieldGroup *fieldGroup1 =
-            new FieldGroup(0, "group1", 9, field0, field1, field2, field3, field4, field5, field6, field7, field8);
+            new FieldGroup(0, "group1_rename", 10, field0, field1, field2, field3, field4, field5, field6, field7, field8, field9);
         //////////////////////////////////////////////
 
         BasicField *field10 =
@@ -119,7 +119,7 @@ public:
             new ComplexGroupState(1, "rgb", 1, fieldRGB);
 
         BasicField *animationsF =
-            new MultipleChoiceField(0, "animations", INPUT_FIELD, group0field0_changed, 5, "OFF", "A1", "A2", "A3", "A4");
+            new MultipleChoiceField(0, "animations", INPUT_FIELD, group0field0_changed, 6, "OFF", "A1", "A2", "A3", "A4", "A5");
 
         ComplexGroupState *state3 =
             new ComplexGroupState(2, "animations", 1, animationsF);

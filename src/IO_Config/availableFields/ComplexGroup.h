@@ -28,6 +28,19 @@ public:
         }
         va_end(arguments);
 
+        for (int i = 0; i < nOfFields; i++)
+        {
+            for (int j = i + 1; j < nOfFields; j++)
+            {
+                if (mFields[i]->getId() > mFields[j]->getId())
+                {
+                    BasicField *swap = mFields[i];
+                    mFields[i] = mFields[j];
+                    mFields[j] = swap;
+                }
+            }
+        }
+
         String info;
         info = "{\"id\":" + String(mStateId) + ", \"stateName\":\"" + mStateName + "\",\"fields\":[";
         for (int i = 0; i < nOfFields; i++)
@@ -71,7 +84,7 @@ private:
     ComplexGroupState **mStates;
     int mNofStates;
     void (*onStateChangeListener)(void);
-    int currentState;
+    int mCurrentState;
     String complexGroupInfo;
 
 public:
@@ -81,6 +94,7 @@ public:
         mGroupName = groupName;
         mNofStates = n;
         onStateChangeListener = func;
+        mCurrentState = 0;
 
         mStates = (ComplexGroupState **)calloc(mNofStates, sizeof(ComplexGroupState *));
 
@@ -92,7 +106,20 @@ public:
         }
         va_end(arguments);
 
-        String info = "{\"id\":" + String(mGroupId) + ",\"groupName\":\"" + mGroupName + "\",\"fieldGroupStates\":[";
+        for (int i = 0; i < mNofStates; i++)
+        {
+            for (int j = i + 1; j < mNofStates; j++)
+            {
+                if (mStates[i]->getStateId() > mStates[j]->getStateId())
+                {
+                    ComplexGroupState *swap = mStates[i];
+                    mStates[i] = mStates[j];
+                    mStates[j] = swap;
+                }
+            }
+        }
+
+        String info = "{\"id\":" + String(mGroupId) + ",\"groupName\":\"" + mGroupName + "\",\"currentState\":" + mCurrentState + ",\"fieldGroupStates\":[";
         for (int i = 0; i < mNofStates; i++)
         {
             info = info + mStates[i]->getInfo();
@@ -115,7 +142,7 @@ public:
         if (n >= 0 && n <= mNofStates)
         {
             onStateChangeListener();
-            currentState = n;
+            mCurrentState = n;
         }
     }
 
@@ -164,6 +191,19 @@ public:
             mComplexGroups[i] = va_arg(arguments, ComplexGroup *);
         }
         va_end(arguments);
+
+        for (int i = 0; i < NofComplexGroups; i++)
+        {
+            for (int j = i + 1; j < NofComplexGroups; j++)
+            {
+                if (mComplexGroups[i]->getComplexGroupId() > mComplexGroups[j]->getComplexGroupId())
+                {
+                    ComplexGroup *swap = mComplexGroups[i];
+                    mComplexGroups[i] = mComplexGroups[j];
+                    mComplexGroups[j] = swap;
+                }
+            }
+        }
 
         String info;
         info = "[";
