@@ -27,7 +27,7 @@ class WS
 {
 private:
     // String basicLink = "wss://devcontrol-backend-proba1.onrender.com/";
-    String basicLink = "ws://192.168.1.103:8000";
+    String basicLink = "ws://192.168.1.70:8000";
     WSSConnection *connection;
 
 public:
