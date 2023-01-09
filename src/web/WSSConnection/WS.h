@@ -23,6 +23,10 @@ typedef struct wSSConnection
     wSSConnection *nextConnection;
 } WSSConnection;
 
+String tempMessageHolder = "";
+
+String newDataBuffer = "";  //""buffer""
+
 class WS
 {
 private:
@@ -32,7 +36,6 @@ private:
     WSSConnection *connection;
     int messagesLastChecked = 0;
     int messageCheckInterval = 500;
-
 public:
     bool connectAndMaintainConnection()
     {
@@ -88,9 +91,10 @@ public:
 
     bool connectToWS(WSSConnection *newConn)
     {
-        const esp_websocket_client_config_t ws_cfg = {
+        esp_websocket_client_config_t ws_cfg = {
             .uri = basicLink.c_str(),
         };
+        ws_cfg.buffer_size = 10000;
         esp_websocket_client_handle_t newHandle = esp_websocket_client_init(&ws_cfg);
         esp_websocket_register_events(newHandle, WEBSOCKET_EVENT_DATA, websocket_event_handler, (void *)newHandle);
         esp_err_t x = esp_websocket_client_start(newHandle);
@@ -150,32 +154,73 @@ public:
     {
         esp_websocket_event_data_t *data = (esp_websocket_event_data_t *)event_data;
         
-        String dataX;
+        String newData;
         switch (event_id) {
-        case WEBSOCKET_EVENT_CONNECTED:
-            Serial.println("WEBSOCKET_EVENT_CONNECTED");
-            break;
-        case WEBSOCKET_EVENT_DISCONNECTED:
-            Serial.println("WEBSOCKET_EVENT_DISCONNECTED");
-            break;
-        case WEBSOCKET_EVENT_DATA:
-            // Serial.println("WEBSOCKET_EVENT_DATA");
-            // // Serial.println(data->op_code);
-            // // Serial.println(data->payload_offset);
-            // dataX = (char *)(data->data_ptr);
-            // // Serial.println("Received=%.*s", data->data_len, (char *)data->data_ptr);
-            // Serial.println(dataX.c_str());
-            Serial.println("WEBSOCKET_EVENT_CONNECTED");
+            case WEBSOCKET_EVENT_CONNECTED:
+                Serial.println("WEBSOCKET_EVENT_CONNECTED");
+                break;
+            case WEBSOCKET_EVENT_DISCONNECTED:
+                Serial.println("WEBSOCKET_EVENT_DISCONNECTED");
+                break;
+            case WEBSOCKET_EVENT_DATA:
+                Serial.println("WEBSOCKET_EVENT_DATA");
+                Serial.println(data->op_code);
+                Serial.println(data->payload_offset);
+                newData = (char *)(data->data_ptr);
+                // Serial.println("Received=%.*s", data->data_len, (char *)data->data_ptr);
+                newData = newData.substring(0, data ->payload_len);
+                Serial.println(newData.c_str());
+                newDataBuffer = newData.c_str();
+                newData = "";
+                Serial.println("result");
+                Serial.println(newDataBuffer.c_str());
+                
+                // Serial.println("QQQQQQQQQQQQQQ");
+                // if(newData.length() > 1024){
+                //     Serial.println("dodana null vrijednost");
+                //     newData = newData.substring(0,1024);
+                //     // newData[1024] = '\0';
+                // }
+                // Serial.println("lenggggth");
+                // Serial.println(newData.length());
+                // if(newData.length() == 1024){
+                //     tempMessageHolder += newData;
+                //     Serial.println("tempHolder");
+                //     Serial.println(tempMessageHolder);
+                // }else{
+                //     if(data->payload_offset == 0){
+                //         tempMessageHolder = "";
+                //         Serial.println("NEW_DATAAAAAAAAAAA");
+                //         newDataBuffer = newData;
+                //         Serial.println(newDataBuffer);
+                //         Serial.println("NEW_DATAAAAAAAAAAA_END");
+
+                //     }
+                //     else{
+                //         Serial.println("NEW_DATAAAAAAAAAAA");
+                //         newDataBuffer = tempMessageHolder + newData;
+                //         tempMessageHolder = "";
+                //         Serial.println(newDataBuffer);
+                //         Serial.println("NEW_DATAAAAAAAAAAA_END");
+                //     }
+                // }        
+                
+                
+                // Serial.println("WEBSOCKET_EVENT_DATA");
+                
+            //       ESP_LOGI(TAG, "WEBSOCKET_EVENT_DATA");
+            // ESP_LOGI(TAG, "Received opcode=%d", data->op_code);
+            // ESP_LOGW(TAG, "Received=%.*s", data->data_len, (char *)data->data_ptr);
+            // ESP_LOGW(TAG, "Total payload length=%d, data_len=%d, current payload offset=%d\r\n", data->payload_len, data->data_len, data->payload_offset);
+                
+                break;
+            case WEBSOCKET_EVENT_ERROR:
+                Serial.println("WEBSOCKET_EVENT_ERROR");
+                break;
             
-              ESP_LOGI(TAG, "WEBSOCKET_EVENT_DATA");
-        ESP_LOGI(TAG, "Received opcode=%d", data->op_code);
-        ESP_LOGW(TAG, "Received=%.*s", data->data_len, (char *)data->data_ptr);
-        ESP_LOGW(TAG, "Total payload length=%d, data_len=%d, current payload offset=%d\r\n", data->payload_len, data->data_len, data->payload_offset);
-            
-            break;
-        case WEBSOCKET_EVENT_ERROR:
-            Serial.println("WEBSOCKET_EVENT_ERROR");
-            break;
+            case WEBSOCKET_EVENT_MAX:
+                Serial.println("WEBSOCKET_EVENT_MAX");
+                break;
         }
     }
 
