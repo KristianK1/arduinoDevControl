@@ -50,7 +50,7 @@ public:
                 BasicField *field = group.getFields()[j];
                 
                 String fieldType = field->getFieldType().c_str();
-                Serial.println(fieldType.c_str());
+                Serial.println("|" + fieldType);
                 if(strcmp(fieldType.c_str(),"numeric") == 0){
                     Serial.println("proso numeric");
                     void *pointer = field;
@@ -120,6 +120,7 @@ public:
                 }
                 else{
                     Serial.println("KRIVI TIP FIELDA");
+                    Serial.println(fieldType.c_str());
                 }
             }
         }

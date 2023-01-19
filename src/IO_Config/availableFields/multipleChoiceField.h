@@ -11,9 +11,10 @@ private:
     String *mChoices;
     int NofChoices;
     int mValue;
+    void (*onChangeListener)(int);
 
 public:
-    MultipleChoiceField(int fieldId, String fieldName, int direction, void func(), int num, ...)
+    MultipleChoiceField(int fieldId, String fieldName, int direction, void func(int), int num, ...)
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
@@ -70,7 +71,7 @@ public:
     {
         if (value >= 0 && value < NofChoices)
         {
-            onChangeListener();
+            onChangeListener(value);
             mValue = value;
         }
     }
@@ -82,6 +83,7 @@ public:
             if (strcmp(mChoices[i].c_str(), value) == 0)
             {
                 mValue = i;
+                onChangeListener(mValue);
                 return;
             }
         }

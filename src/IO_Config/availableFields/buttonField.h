@@ -9,9 +9,10 @@ class ButtonField : public BasicField
 {
 private:
     bool mValue;
+    void (*onChangeListener)(bool);
 
 public:
-    ButtonField(int fieldId, String fieldName, int direction, bool value, void func())
+    ButtonField(int fieldId, String fieldName, int direction, bool value, void func(bool))
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
@@ -52,7 +53,7 @@ public:
 
     void setValue(bool value)
     {
-        onChangeListener();
+        onChangeListener(value);
         mValue = value;
     }
 

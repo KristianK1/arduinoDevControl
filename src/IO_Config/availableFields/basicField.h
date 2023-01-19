@@ -9,7 +9,6 @@ class BasicField
 protected:
     int mFieldId;
     String mFieldName;
-    void (*onChangeListener)(void);
     
     int mFieldDirection; //INPUT OR OUTPUT
     String fieldInformation = "";
@@ -20,7 +19,7 @@ public:
     virtual ~BasicField(){
 
     }
-    
+
     int getId()
     {
         return mFieldId;

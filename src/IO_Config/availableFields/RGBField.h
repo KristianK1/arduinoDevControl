@@ -14,9 +14,10 @@ class RGBField : public BasicField
 {
 private:
     RGB mValue;
+    void (*onChangeListener)(int, int, int);
 
 public:
-    RGBField(int fieldId, String fieldName, RGB value, void func())
+    RGBField(int fieldId, String fieldName, RGB value, void func(int, int,int))
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
@@ -44,10 +45,11 @@ public:
         fieldInformation = myString;
     }
 
-    RGBField(int fieldId, String fieldName, int R, int G, int B, void func())
+    RGBField(int fieldId, String fieldName, int R, int G, int B, void func(int, int, int))
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
+        mFieldType = "RGB";
 
         onChangeListener = func;
 
@@ -82,8 +84,8 @@ public:
 
     void setValue(RGB value)
     {
-        onChangeListener();
         mValue = value;
+        onChangeListener(value.R, value.G, value.B);
     }
 
     void setValue(int R, int G, int B)
@@ -91,6 +93,7 @@ public:
         mValue.B = R;
         mValue.G = G;
         mValue.B = B;
+        onChangeListener(R, G, B);
     }
 
     int getId()
