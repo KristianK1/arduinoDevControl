@@ -23,20 +23,22 @@ typedef struct wSSConnection
     wSSConnection *nextConnection;
 } WSSConnection;
 
-String tempMessageHolder = "";
 
 String newDataBuffer = "";  //""buffer""
 
+static String newMessageHolder = "";
 class WS
 {
 private:
-    // String basicLink = "wss://devcontrol-backend-proba1.onrender.com/";
-    String basicLink = "ws://192.168.1.70:8000";
+    String basicLink = "wss://devcontrol-backend.onrender.com/";
+    // String basicLink = "wss://devcontrol.herokuapp.com/";
+    // String basicLink = "ws://192.168.1.70:8000";
     
     WSSConnection *connection;
     int messagesLastChecked = 0;
     int messageCheckInterval = 500;
 public:
+
     bool connectAndMaintainConnection()
     {
         if (connection == NULL)
@@ -174,45 +176,7 @@ public:
                 newData = "";
                 Serial.println("result");
                 Serial.println(newDataBuffer.c_str());
-                
-                // Serial.println("QQQQQQQQQQQQQQ");
-                // if(newData.length() > 1024){
-                //     Serial.println("dodana null vrijednost");
-                //     newData = newData.substring(0,1024);
-                //     // newData[1024] = '\0';
-                // }
-                // Serial.println("lenggggth");
-                // Serial.println(newData.length());
-                // if(newData.length() == 1024){
-                //     tempMessageHolder += newData;
-                //     Serial.println("tempHolder");
-                //     Serial.println(tempMessageHolder);
-                // }else{
-                //     if(data->payload_offset == 0){
-                //         tempMessageHolder = "";
-                //         Serial.println("NEW_DATAAAAAAAAAAA");
-                //         newDataBuffer = newData;
-                //         Serial.println(newDataBuffer);
-                //         Serial.println("NEW_DATAAAAAAAAAAA_END");
-
-                //     }
-                //     else{
-                //         Serial.println("NEW_DATAAAAAAAAAAA");
-                //         newDataBuffer = tempMessageHolder + newData;
-                //         tempMessageHolder = "";
-                //         Serial.println(newDataBuffer);
-                //         Serial.println("NEW_DATAAAAAAAAAAA_END");
-                //     }
-                // }        
-                
-                
-                // Serial.println("WEBSOCKET_EVENT_DATA");
-                
-            //       ESP_LOGI(TAG, "WEBSOCKET_EVENT_DATA");
-            // ESP_LOGI(TAG, "Received opcode=%d", data->op_code);
-            // ESP_LOGW(TAG, "Received=%.*s", data->data_len, (char *)data->data_ptr);
-            // ESP_LOGW(TAG, "Total payload length=%d, data_len=%d, current payload offset=%d\r\n", data->payload_len, data->data_len, data->payload_offset);
-                
+                newMessageHolder = newDataBuffer.c_str();
                 break;
             case WEBSOCKET_EVENT_ERROR:
                 Serial.println("WEBSOCKET_EVENT_ERROR");

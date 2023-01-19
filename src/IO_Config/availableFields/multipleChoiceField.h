@@ -61,9 +61,9 @@ public:
     {
     }
 
-    String getValue()
+    int getValue()
     {
-        return mChoices[mValue];
+        return mValue;
     }
 
     void setValue(int value)

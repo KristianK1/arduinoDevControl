@@ -38,8 +38,13 @@ public:
         digitalWrite(2, wifiConn);
         if (wifiConn)
         {
-            WS::connectAndMaintainConnection();
-            
+            bool connected = WS::connectAndMaintainConnection();
+            if(connected){
+                if(newMessageHolder.length() > 0){
+                    IO::wsDataParser(newMessageHolder.c_str());
+                    newMessageHolder = "";
+                }
+            } 
 
 
 

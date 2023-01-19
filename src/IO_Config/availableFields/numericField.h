@@ -69,6 +69,7 @@ public:
     void setValue(double value)
     {
         mValue = value;
+        Serial.println("setting the value to " + String(value) + " name: " + mFieldName);
         onChangeListener();
     }
 
