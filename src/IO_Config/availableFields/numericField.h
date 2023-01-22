@@ -12,9 +12,10 @@ private:
     double mMaxValue;
     double mStep;
     double mValue;
+    void (*onChangeListener)(double);
 
 public:
-    NumericField(int fieldId, String fieldName, double minValue, double maxValue, double step, void func(void))
+    NumericField(int fieldId, String fieldName, double minValue, double maxValue, double step, void func(double))
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
@@ -69,7 +70,8 @@ public:
     void setValue(double value)
     {
         mValue = value;
-        onChangeListener();
+        Serial.println("setting the value to " + String(value) + " name: " + mFieldName);
+        onChangeListener(value);
     }
 
     int getId()

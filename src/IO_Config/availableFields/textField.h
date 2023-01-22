@@ -9,9 +9,10 @@ class TextField : public BasicField
 {
 private:
     String mValue;
+    void (*onChangeListener)(String);
 
 public:
-    TextField(int fieldId, String fieldName, int direction, String value, void func(void))
+    TextField(int fieldId, String fieldName, int direction, String value, void func(String))
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
@@ -52,7 +53,7 @@ public:
 
     void setValue(String value)
     {
-        onChangeListener();
+        onChangeListener(value);
         mValue = value;
     }
 

@@ -36,34 +36,93 @@ public:
         return info;
     }
 
-    void reciveData(String data)
-    {
-        DynamicJsonDocument doc(1024);
-        deserializeJson(doc, data.c_str());
+ void wsDataParser(String data){
+        String groupsKey = "deviceFieldGroups";
+        String complexGroupsKey = "deviceFieldComplexGroups";
+        DynamicJsonDocument doc(10000);
+        deserializeJson(doc, data);
+        
+        int NofGroups = FieldGroups::getNumberOfGroups();
+        for(int i = 0; i<NofGroups; i++){
+            FieldGroup group = *(FieldGroups::getFieldGroups()[i]);
 
-<<<<<<< Updated upstream
-        const char *whatToAlter = doc["whatToAlter"];
-        if (strcmp(whatToAlter, "field") == 0)
-        {
-            int groupId = doc["data"]["groupId"];
-            int fieldId = doc["data"]["fieldId"];
+            for(int j = 0; j < group.getNofFields(); j++){
+                BasicField *field = group.getFields()[j];
+                
+                String fieldType = field->getFieldType().c_str();
+                Serial.println("|" + fieldType);
+                if(strcmp(fieldType.c_str(),"numeric") == 0){
+                    Serial.println("proso numeric");
+                    void *pointer = field;
+                    NumericField *numericField = (NumericField*)pointer;
+                    double value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
+                    Serial.print("numeric value: ");
+                    Serial.println(value);
+                    if(numericField->getValue() != value){
+                        Serial.println("numeric1_parser");
+                        Serial.println(numericField->getValue());
+                        Serial.println(numericField->getFieldType());
+                        Serial.println(numericField->getFieldInfo());
+                        changeFieldValue_numeric(group.getGroupId(), field->getId(), value);
+                    }
+                }
+                else if(strcmp(fieldType.c_str(),"text") == 0){
+                    Serial.println("proso text");
+                    void *pointer = field;
+                    TextField *textField = (TextField*)pointer;
+                    String value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
+                    if(textField->getText().compareTo(value)){
+                        changeFieldValue_text(group.getGroupId(), field->getId(), value);
+                    }
+                }
+                else if(strcmp(fieldType.c_str(),"button") == 0){
+                    Serial.println("proso button");
+                    void *pointer = field;
+                    ButtonField *buttonField = (ButtonField*)pointer;
 
-            const char *fieldType = doc["data"]["fieldType"];
-            if (strcmp(fieldType, "numeric") == 0)
-            {
-                double value = doc["data"]["value"]["number"];
-                changeFieldValue_numeric(groupId, fieldId, value);
+                    bool value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
+                    Serial.print("button value: ");
+                    Serial.println(value);
+                    if(buttonField->getValue() != value){
+                        Serial.println("button1_parser");
+                        if(buttonField->getValue() == false){
+                            Serial.println("0false");
+                        }
+                        else if(buttonField->getValue() == true){
+                            Serial.println("1true");
+                        }
+                        else{
+                            Serial.println("pakao zivi");
+                        }
+                        changeFieldValue_button(group.getGroupId(), field->getId(), value);
+                    }
+                }
+                else if(strcmp(fieldType.c_str(),"multipleChoice") == 0){
+                    Serial.println("proso mc");
+                    void *pointer = field;
+                    MultipleChoiceField *multipleChoiceField = (MultipleChoiceField*)pointer;
+                    int value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
+                    if(multipleChoiceField->getValue() != value){
+                        changeFieldValue_multiple(group.getGroupId(), field->getId(), value);
+                    }
+                }
+                else if(strcmp(fieldType.c_str(),"RGB") == 0){
+                    Serial.println("proso rgb");
+                    void *pointer = field;
+                    RGBField *rgbField = (RGBField*)pointer;
+                    int valueR = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["R"];
+                    int valueG = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["G"];
+                    int valueB = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["B"];
+                    RGB currentValue = rgbField->getValue();
+                    if(currentValue.R != valueR || currentValue.G != valueG || currentValue.B != valueB){
+                        changeFieldValue_rgb(group.getGroupId(), field->getId(), valueR, valueG, valueB);
+                    }
+                }
+                else{
+                    Serial.println("KRIVI TIP FIELDA");
+                    Serial.println(fieldType.c_str());
+                }
             }
-            else if (strcmp(fieldType, "text") == 0)
-            {
-                const char *text = doc["data"]["value"]["text"];
-                changeFieldValue_text(groupId, fieldId, text);
-            }
-            else if (strcmp(fieldType, "button") == 0)
-            {
-                boolean onOff = doc["data"]["value"]["onOff"];
-                changeFieldValue_button(groupId, fieldId, onOff);
-=======
             for(int j = 0; j < group.getNofFields(); j++){
                 BasicField *field = group.getFields()[j];
                 
@@ -125,28 +184,7 @@ public:
                     Serial.println("KRIVI TIP FIELDA");
                     Serial.println(fieldType.c_str());
                 }
->>>>>>> Stashed changes
             }
-            else if (strcmp(fieldType, "multipleChoice") == 0)
-            {
-                int value = doc["data"]["value"]["choice"];
-                changeFieldValue_multiple(groupId, fieldId, value);
-            }
-            else if (strcmp(fieldType, "RGB") == 0)
-            {
-                int R = doc["data"]["value"]["R"];
-                int G = doc["data"]["value"]["G"];
-                int B = doc["data"]["value"]["B"];
-                changeFieldValue_rgb(groupId, fieldId, R, G, B);
-            }
-        }
-        else if (strcmp(whatToAlter, "complexGroupState") == 0)
-        {
-            int groupId = doc["data"]["groupId"];
-            const char *state = doc["data"]["state"];
-        }
-        else if (strcmp(whatToAlter, "fieldInComplexGroup") == 0)
-        {
         }
     }
 
@@ -164,7 +202,7 @@ public:
         fieldAdd->setValue(value);
     }
 
-    void changeFieldValue_button(int groupId, int fieldId, boolean value)
+    void changeFieldValue_button(int groupId, int fieldId, bool value)
     {
         BasicField *field = findFieldById(groupId, fieldId);
         ButtonField *fieldAdd = (ButtonField *)field;
@@ -190,7 +228,7 @@ public:
         ComplexGroup *complexGroup = findComplexGroupById(groupId);
         complexGroup->changeState(stateId);
     }
-    ////////////////////
+
     void changeFieldInComplexGroup_numeric(int groupId, int stateId, int fieldId, double value)
     {
         BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
@@ -204,7 +242,7 @@ public:
         TextField *fieldAdd = (TextField *)field;
         fieldAdd->setValue(value);
     }
-    void changeFieldInComplexGroup_button(int groupId, int stateId, int fieldId, boolean value)
+    void changeFieldInComplexGroup_button(int groupId, int stateId, int fieldId, bool value)
     {
         BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
         ButtonField *fieldAdd = (ButtonField *)field;
@@ -254,8 +292,6 @@ public:
         }
         return NULL;
     }
-
-    /////////////////
 
     ComplexGroup *findComplexGroupById(int groupId)
     {

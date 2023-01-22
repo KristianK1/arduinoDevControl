@@ -21,31 +21,34 @@ public:
     //     // trebat ce nekad
     // }
 
+
+    void setup(){
+        
+        bool wifiConn = WiFistate::keepConnectionAlive();
+
+        while(WiFistate::checkConnection() == false) {}
+        WS::connectAndMaintainConnection();
+        delay(500);
+        IO::setupFields();
+        registerDevice();
+    }
     void loop()
     {
         bool wifiConn = WiFistate::keepConnectionAlive();
         digitalWrite(2, wifiConn);
         if (wifiConn)
         {
-            // if (millis() - tempTimer > 10000)
-            // {
-            //     Serial.println("post");
-            //     tempTimer = millis();
-            //     HTTPresult result = HTTP::post("API/userAuth/register", "{\"username\":\"esp32_BBB\",\"password\":\"esp32\",\"email\":\"emaill\"}");
-            //     if (result.success)
-            //     {
-            //         Serial.println(result.payload);
-            //     }
-            // }
+            bool connected = WS::connectAndMaintainConnection();
+            if(connected){
+                if(newMessageHolder.length() > 0){
+                    IO::wsDataParser(newMessageHolder.c_str());
+                    newMessageHolder = "";
+                }
+            } 
 
-            // WS::connectAndMaintainConnection();
+
+
         }
-
-        delay(500);
-        IO::setupFields();
-        registerDevice();
-        delay(60 * 1000);
-
     }
 
     void registerDevice()

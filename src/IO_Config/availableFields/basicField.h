@@ -9,19 +9,26 @@ class BasicField
 protected:
     int mFieldId;
     String mFieldName;
-    void (*onChangeListener)(void);
     
     int mFieldDirection; //INPUT OR OUTPUT
-    String fieldInformation;
+    String fieldInformation = "";
     String mFieldType;
 
 public:
+
+    virtual ~BasicField(){
+
+    }
+
     int getId()
     {
         return mFieldId;
     }
 
     String getFieldInfo(){
+        Serial.println("crashes");
+        Serial.println(fieldInformation.c_str());
+        Serial.println("crashes2");
         return fieldInformation;
     }
 

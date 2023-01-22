@@ -8,10 +8,11 @@
 class ButtonField : public BasicField
 {
 private:
-    boolean mValue;
+    bool mValue;
+    void (*onChangeListener)(bool);
 
 public:
-    ButtonField(int fieldId, String fieldName, int direction, boolean value, void func())
+    ButtonField(int fieldId, String fieldName, int direction, bool value, void func(bool))
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
@@ -45,14 +46,14 @@ public:
     {
     }
 
-    boolean getValue()
+    bool getValue()
     {
         return mValue;
     }
 
-    void setValue(boolean value)
+    void setValue(bool value)
     {
-        onChangeListener();
+        onChangeListener(value);
         mValue = value;
     }
 
