@@ -41,6 +41,7 @@ public:
         DynamicJsonDocument doc(1024);
         deserializeJson(doc, data.c_str());
 
+<<<<<<< Updated upstream
         const char *whatToAlter = doc["whatToAlter"];
         if (strcmp(whatToAlter, "field") == 0)
         {
@@ -62,6 +63,69 @@ public:
             {
                 boolean onOff = doc["data"]["value"]["onOff"];
                 changeFieldValue_button(groupId, fieldId, onOff);
+=======
+            for(int j = 0; j < group.getNofFields(); j++){
+                BasicField *field = group.getFields()[j];
+                
+                String fieldType = field->getFieldType().c_str();
+                Serial.println("|" + fieldType);
+                if(strcmp(fieldType.c_str(),"numeric") == 0){
+                    void *pointer = field;
+                    NumericField *numericField = (NumericField*)pointer;
+                    double value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
+                    if(numericField->getValue() != value){
+                        Serial.println("proso numeric");
+                        Serial.println(numericField->getValue());
+                        Serial.println(numericField->getFieldType());
+                        Serial.println(numericField->getFieldInfo());
+                        changeFieldValue_numeric(group.getGroupId(), field->getId(), value);
+                    }
+                }
+                else if(strcmp(fieldType.c_str(),"text") == 0){
+                    void *pointer = field;
+                    TextField *textField = (TextField*)pointer;
+                    String value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
+                    if(textField->getText().compareTo(value)){
+                        Serial.println("proso text");
+                        changeFieldValue_text(group.getGroupId(), field->getId(), value);
+                    }
+                }
+                else if(strcmp(fieldType.c_str(),"button") == 0){
+                    void *pointer = field;
+                    ButtonField *buttonField = (ButtonField*)pointer;
+
+                    bool value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
+                    if(buttonField->getValue() != value){
+                        Serial.println("proso button");
+                        changeFieldValue_button(group.getGroupId(), field->getId(), value);
+                    }
+                }
+                else if(strcmp(fieldType.c_str(),"multipleChoice") == 0){
+                    void *pointer = field;
+                    MultipleChoiceField *multipleChoiceField = (MultipleChoiceField*)pointer;
+                    int value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
+                    if(multipleChoiceField->getValue() != value){
+                        Serial.println("proso mc");
+                        changeFieldValue_multiple(group.getGroupId(), field->getId(), value);
+                    }
+                }
+                else if(strcmp(fieldType.c_str(),"RGB") == 0){
+                    void *pointer = field;
+                    RGBField *rgbField = (RGBField*)pointer;
+                    int valueR = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["R"];
+                    int valueG = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["G"];
+                    int valueB = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["B"];
+                    RGB currentValue = rgbField->getValue();
+                    if(currentValue.R != valueR || currentValue.G != valueG || currentValue.B != valueB){
+                    Serial.println("proso rgb");
+                        changeFieldValue_rgb(group.getGroupId(), field->getId(), valueR, valueG, valueB);
+                    }
+                }
+                else{
+                    Serial.println("KRIVI TIP FIELDA");
+                    Serial.println(fieldType.c_str());
+                }
+>>>>>>> Stashed changes
             }
             else if (strcmp(fieldType, "multipleChoice") == 0)
             {

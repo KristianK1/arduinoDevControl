@@ -9,6 +9,7 @@
 #include "availableFields/basicField.h"
 #include "availableFields/FieldGroup.h"
 #include "availableFields/ComplexGroup.h"
+<<<<<<< Updated upstream
 
 void group0field0_changed()
 {
@@ -24,6 +25,86 @@ void RGBchanged()
 {
     Serial.println("changeddddddddddd - func pointer works");
 }
+=======
+#include "ArduinoJson.h"
+#include <Adafruit_NeoPixel.h>
+#include<math.h>
+
+Adafruit_NeoPixel pixels(3, 13, NEO_GRB + NEO_KHZ800);
+
+void led1_changed(double value){
+    int brightness = (int) (pow(1.3,value) - 1)*5.3;
+    pixels.begin();
+    pixels.setPixelColor(0, pixels.Color(brightness,brightness,brightness));
+    pixels.show();
+}
+
+void led2_changed(int value){
+    pixels.begin();
+    switch(value){
+        case 0: 
+            pixels.setPixelColor(1, pixels.Color(0,0,0));
+        break;
+        case 1: 
+            pixels.setPixelColor(1, pixels.Color(255,0,0));
+        break;
+        case 2: 
+            pixels.setPixelColor(1, pixels.Color(0,255,0));
+        break;
+        case 3: 
+            pixels.setPixelColor(1, pixels.Color(0,0,255));
+        break;
+        case 4: 
+            pixels.setPixelColor(1, pixels.Color(255,255,255));
+        break;
+    }
+    pixels.show();
+}
+
+void led3_changed(int r, int g, int b){
+    r = (int)pow(1.0235,r)-1;
+    g = (int)pow(1.0235,g)-1;
+    b = (int)pow(1.0235,b)-1;
+    pixels.begin();
+    pixels.setPixelColor(2, pixels.Color(r,g,b));
+    pixels.show();
+}
+
+void led4_changed(bool value)
+{
+    digitalWrite(23, value);
+}
+
+// void RGB_1(int r, int g, int b){
+//     r = (int)pow(1.0235,r);
+//     g = (int)pow(1.0235,g);
+//     b = (int)pow(1.0235,b);
+//     pixels.begin();
+//     pixels.setPixelColor(2, pixels.Color(r,g,b));
+//     pixels.show();
+// }
+
+
+
+// void ostaloNumeric(double value)
+// {
+//     Serial.println("ostalo");
+// }
+
+// void ostaloMC(int value)
+// {
+//     Serial.println("ostalo");
+// }
+
+// void ostaloRGB(int r, int g, int b){
+
+// }
+
+// void ostalo(){
+
+// }
+
+>>>>>>> Stashed changes
 
 class ThisDevice : protected FieldGroups, protected ComplexGroups
 {
@@ -32,6 +113,7 @@ public:
     {
         ///////////////////////////////////////////////
         BasicField *field0 =
+<<<<<<< Updated upstream
             new NumericField(50, "field0", -1.0, 25.0, 1.0, group0field0_changed__H);
 
         BasicField *field1 =
@@ -54,6 +136,20 @@ public:
 
         BasicField *field7 =
             new ButtonField(7, "field7", INPUT_FIELD, true, group0field0_changed);
+=======
+            new NumericField(0, "LED 1", 0.0, 15.0, 0.5, led1_changed);
+
+        BasicField *field1 =
+            new MultipleChoiceField(1, "LED 2", INPUT_FIELD, led2_changed, 5, "Off", "Red", "Green", "Blue", "White");
+
+        BasicField *field2 =
+            new RGBField(2, "LED 3", 0, 0, 0, led3_changed);
+
+        FieldGroup *fieldGroup0 =
+            new FieldGroup(0, "WS2812b", 3, field0, field1, field2);
+
+
+>>>>>>> Stashed changes
 
         BasicField *field8 =
             new ButtonField(8, "field8", INPUT_FIELD, true, group0field0_changed);
@@ -64,6 +160,7 @@ public:
         FieldGroup *fieldGroup1 =
             new FieldGroup(0, "group1_rename", 10, field0, field1, field2, field3, field4, field5, field6, field7, field8, field9);
         //////////////////////////////////////////////
+<<<<<<< Updated upstream
 
         BasicField *field10 =
             new NumericField(0, "field0", -1.0, 25.0, 1.0, group0field0_changed);
@@ -91,6 +188,15 @@ public:
         ///////////////////////////////////////////////
 
         createGroups(2, fieldGroup1, fieldGroup2);
+=======
+        BasicField *field3 =
+            new ButtonField(1, "Blue LED", INPUT_FIELD, false, led4_changed);
+
+        FieldGroup *fieldGroup1 =
+            new FieldGroup(1, "LED", 1, field3);
+
+        createGroups(2, fieldGroup0, fieldGroup1);
+>>>>>>> Stashed changes
 
         //////////////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +206,7 @@ public:
         //////////////////////////////////////////////////////////////////////////////////////////
         /// @brief ///////////////////////////////////////////////////////////////////////////////
 
+<<<<<<< Updated upstream
         BasicField *field21 =
             new NumericField(0, "RField", 0.0, 25.0, 1.0, group0field0_changed);
 
@@ -108,22 +215,43 @@ public:
 
         BasicField *field23 =
             new NumericField(2, "BField", 0.0, 25.0, 1.0, group0field0_changed);
+=======
+        // BasicField *field21 =
+        //     new NumericField(0, "RField", 0.0, 25.0, 1.0, ostaloNumeric);
 
-        ComplexGroupState *state1 =
-            new ComplexGroupState(0, "individual", 3, field21, field22, field23);
+        // BasicField *field22 =
+        //     new NumericField(1, "GField", 0.0, 25.0, 1.0, ostaloNumeric);
 
+        // BasicField *field23 =
+        //     new NumericField(2, "BField", 0.0, 25.0, 1.0, ostaloNumeric);
+>>>>>>> Stashed changes
+
+        // ComplexGroupState *state1 =
+        //     new ComplexGroupState(0, "individual", 3, field21, field22, field23);
+
+<<<<<<< Updated upstream
         BasicField *fieldRGB =
             new RGBField(0, "RGB", 0, 0, 0, group0field0_changed);
+=======
+        // BasicField *fieldRGB =
+        //     new RGBField(0, "RGB", 0, 0, 0, ostaloRGB);
+>>>>>>> Stashed changes
 
-        ComplexGroupState *state2 =
-            new ComplexGroupState(1, "rgb", 1, fieldRGB);
+        // ComplexGroupState *state2 =
+        //     new ComplexGroupState(1, "rgb", 1, fieldRGB);
 
+<<<<<<< Updated upstream
         BasicField *animationsF =
             new MultipleChoiceField(0, "animations", INPUT_FIELD, group0field0_changed, 6, "OFF", "A1", "A2", "A3", "A4", "A5");
+=======
+        // BasicField *animationsF =
+        //     new MultipleChoiceField(0, "animations", INPUT_FIELD, ostaloMC, 6, "OFF", "A1", "A2", "A3", "A4", "A5");
+>>>>>>> Stashed changes
 
-        ComplexGroupState *state3 =
-            new ComplexGroupState(2, "animations", 1, animationsF);
+        // ComplexGroupState *state3 =
+        //     new ComplexGroupState(2, "animations", 1, animationsF);
 
+<<<<<<< Updated upstream
         ComplexGroup *group1 =
             new ComplexGroup(0, "complexGroup1", group0field0_changed, 3, state1, state2, state3);
 
@@ -157,6 +285,14 @@ public:
             new ComplexGroup(1, "complexGroup1_new", group0field0_changed, 3, state1_x, state2_x, state3_x);
 
         createComplexGroups(2, group1, group2);
+=======
+        // ComplexGroup *CG0 =
+        //     new ComplexGroup(0, "complexGroup1", ostalo, 3, state1, state2, state3);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
+        createComplexGroups(0);
+>>>>>>> Stashed changes
     }
 };
 
