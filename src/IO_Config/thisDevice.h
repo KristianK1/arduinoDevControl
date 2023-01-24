@@ -9,13 +9,18 @@
 #include "availableFields/basicField.h"
 #include "availableFields/FieldGroup.h"
 #include "availableFields/ComplexGroup.h"
+
 #include "ArduinoJson.h"
 #include <Adafruit_NeoPixel.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 Adafruit_NeoPixel pixels(3, 13, NEO_GRB + NEO_KHZ800);
+OneWire oneWire(4); 
+DallasTemperature sensors(&oneWire);
 
 void led1_changed(double value){
-    int brightness = (int) (pow(1.3,value) - 1)*5.3;
+    int brightness = (int) (pow(1.12,value) - 1)*15.8;
     pixels.setPixelColor(0, pixels.Color(brightness,brightness,brightness));
     pixels.show();
 }
@@ -62,7 +67,7 @@ class ThisDevice : protected FieldGroups, protected ComplexGroups
 {
 private:
     NumericField *field0 = 
-        new NumericField(0, "LED 1", 0.0, 15.0, 0.5, led1_changed);
+        new NumericField(0, "LED 1", 0.0, 25.0, 1, led1_changed);
 
     MultipleChoiceField *field1 =
         new MultipleChoiceField(1, "LED 2", INPUT_FIELD, led2_changed, 5, "Off", "Red", "Green", "Blue", "White");
@@ -80,21 +85,15 @@ private:
         new FieldGroup(1, "LED", 1, field3);
 
     TextField *potField = 
-        new TextField(0, "Potenciometar", OUTPUT_FIELD, "0", emptyFunction);
+        new TextField(0, "Potentiometer", OUTPUT_FIELD, "0", emptyFunction);
+
+    TextField *tempField = 
+        new TextField(1, "Temperature", OUTPUT_FIELD, "0 °C", emptyFunction);
 
     FieldGroup *fieldGroup2 =
-        new FieldGroup(2, "Inputs", 1, potField);
-public:
-    void setupFields()
-    {
-        pixels.begin();
-        pinMode(23, OUTPUT);
-        createGroups(3, fieldGroup0, fieldGroup1, fieldGroup2);
-       
-        createComplexGroups(0);
-    }
+        new FieldGroup(2, "Inputs", 2, potField, tempField);
 
-    void loop(){
+    void potentiometerLoop(){
         int potValue = analogRead(34); //12bit
         Serial.println("potValue:");
         Serial.println(potValue);
@@ -104,9 +103,46 @@ public:
 
         Serial.println("oldValue:");
         Serial.println(currentValue);
-        if(currentValue - potValue > 200 || currentValue - potValue < -200){
+        if(currentValue - potValue > 50 || currentValue - potValue < -50){
+            // potField->setValue(String(potValue));
             setTextField(fieldGroup2->getGroupId(), potField->getId(), String(potValue));
         }
+    }
+
+    void temperatureLoop(){
+        sensors.begin();
+        sensors.requestTemperatures(); // Send the command to get temperatures
+        float tempC = sensors.getTempCByIndex(0);
+        Serial.println(tempC);
+
+        String currentStr = tempField->getText();
+        float currentValue = 0;
+        sscanf(currentStr.c_str(),"%f °C", &currentValue);
+        Serial.println(currentValue);
+
+        float diff = currentValue - tempC;
+        if(diff > 0.1 || diff < -0.1){
+            char stringPayload[7] = {0};
+            dtostrf(tempC, -7, 2, stringPayload);
+            // tempField->setValue(String(stringPayload) + " °C");
+            setTextField(fieldGroup2->getGroupId(), tempField->getId(), String(stringPayload) + " °C");
+        }
+    }
+
+public:
+    void setupFields()
+    {
+        pixels.begin();
+        pinMode(23, OUTPUT);
+        sensors.begin();
+        
+        createGroups(3, fieldGroup0, fieldGroup1, fieldGroup2);
+        createComplexGroups(0);
+    }
+
+    void loop(){
+        potentiometerLoop();
+        temperatureLoop();
     }
 
     virtual double getNumericFieldValue(int groupId, int fieldId) = 0;
