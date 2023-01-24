@@ -13,9 +13,6 @@ private:
     String information;
 
 public:
-    void loop()
-    {
-    }
 
     String getTotalDeviceString()
     {
@@ -341,22 +338,90 @@ public:
         return NULL;
     }
 
-    ///////////////////////////////////////////////////////
-
-    void test()
-    {
-        setupFields();
-        // getTotalDeviceString();
-        // {
-        //     BasicField *field = findFieldById(0, 0);
-        //     NumericField *fieldAdd = (NumericField *)field;
-        //     fieldAdd->setValue(23);
-        // }
-        // {
-        //     BasicField *field = findFieldinComplexGroup(1, 1, 0);
-        //     RGBField *fieldRGB = (RGBField *)field;
-        // }
+    double getNumericFieldValue(int groupId, int fieldId){
+        BasicField *field = findFieldById(groupId, fieldId);
+        NumericField *fieldAdd = (NumericField *)field;
+        return fieldAdd->getValue();
     }
+    String getTextFieldValue(int groupId, int fieldId){
+        BasicField *field = findFieldById(groupId, fieldId);
+        TextField *fieldAdd = (TextField *)field;
+        return fieldAdd->getText();
+    }
+    bool getButtonFieldValue(int groupId, int fieldId){
+        BasicField *field = findFieldById(groupId, fieldId);
+        ButtonField *fieldAdd = (ButtonField *)field;
+        return fieldAdd->getValue();
+    }
+    int getMCFieldValue(int groupId, int fieldId){
+        BasicField *field = findFieldById(groupId, fieldId);
+        MultipleChoiceField *fieldAdd = (MultipleChoiceField *)field;
+        return fieldAdd->getValue();
+    }   
+    RGB getRGBFieldValue(int groupId, int fieldId){
+        BasicField *field = findFieldById(groupId, fieldId);
+        RGBField *fieldAdd = (RGBField *)field;
+        return fieldAdd->getValue();
+    }
+
+    virtual void setNumericField(int groupId, int fieldId, double value) {
+        DynamicJsonDocument doc(1024);
+        doc["deviceKey"] = deviceKey;
+        doc["groupId"]   = groupId;
+        doc["fieldId"] = fieldId;
+        doc["fieldValue"] = value;
+        String body;
+        serializeJson(doc, body);
+        httpPost("API/device/changeField/device", body);
+    }
+
+    virtual void setButtonField(int groupId, int fieldId, bool value){
+        DynamicJsonDocument doc(1024);
+        doc["deviceKey"] = deviceKey;
+        doc["groupId"]   = groupId;
+        doc["fieldId"] = fieldId;
+        doc["fieldValue"] = value;
+        String body;
+        serializeJson(doc, body);
+        httpPost("API/device/changeField/device", body);
+    }
+
+    virtual void setMCfield(int groupId, int fieldId, int value){
+        DynamicJsonDocument doc(1024);
+        doc["deviceKey"] = deviceKey;
+        doc["groupId"]   = groupId;
+        doc["fieldId"] = fieldId;
+        doc["fieldValue"] = value;
+        String body;
+        serializeJson(doc, body);
+        httpPost("API/device/changeField/device", body);
+    }
+
+    virtual void setRGBfield(int groupId, int fieldId, int R, int G, int B){
+        DynamicJsonDocument doc(1024);
+        doc["deviceKey"] = deviceKey;
+        doc["groupId"]   = groupId;
+        doc["fieldId"] = fieldId;
+        doc["fieldValue"]["R"] = R;
+        doc["fieldValue"]["G"] = G;
+        doc["fieldValue"]["B"] = B;
+        String body;
+        serializeJson(doc, body);
+        httpPost("API/device/changeField/device", body);
+    }
+
+    virtual void setTextField(int groupId, int fieldId, String value){
+        DynamicJsonDocument doc(1024);
+        doc["deviceKey"] = deviceKey;
+        doc["groupId"]   = groupId;
+        doc["fieldId"] = fieldId;
+        doc["fieldValue"] = value;
+        String body;
+        serializeJson(doc, body);
+        httpPost("API/device/changeField/device", body);
+    }
+
+    virtual void httpPost(String sublink, String body) = 0;
 };
 
 #endif
