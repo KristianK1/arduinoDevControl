@@ -3,7 +3,6 @@
 Device myDevice;
 
 void setup(){ 
-    pinMode(23, OUTPUT);
     Serial.begin(115200);   
     myDevice.setup(); 
 }

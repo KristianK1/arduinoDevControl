@@ -23,19 +23,17 @@ public:
 
 
     void setup(){
-        
         bool wifiConn = WiFistate::keepConnectionAlive();
-
         while(WiFistate::checkConnection() == false) {}
         WS::connectAndMaintainConnection();
         delay(500);
         IO::setupFields();
         registerDevice();
     }
+
     void loop()
     {
         bool wifiConn = WiFistate::keepConnectionAlive();
-        digitalWrite(2, wifiConn);
         if (wifiConn)
         {
             bool connected = WS::connectAndMaintainConnection();
@@ -44,11 +42,10 @@ public:
                     IO::wsDataParser(newMessageHolder.c_str());
                     newMessageHolder = "";
                 }
-            } 
-
-
-
+            }
         }
+        IO::loop();
+        delay(200);
     }
 
     void registerDevice()
@@ -56,6 +53,10 @@ public:
         String data = IO::getTotalDeviceString();
         Serial.println(data);
         HTTP::post("API/device/registerDeviceData", data);
+    }
+
+    void httpPost(String sublink, String body){
+        HTTP::post(sublink, body);
     }
 };
 
