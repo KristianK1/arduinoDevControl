@@ -92,7 +92,7 @@ public:
     void setupFields()
     {
         BasicField *field0 =
-            new NumericField(0, "LED 1", 0.0, 15.0, 0.5, led1_changed);
+            new NumericField(0, "LED 1", 0.0, 15.0, 0.5, "T=", "°C", led1_changed);
 
         BasicField *field1 =
             new MultipleChoiceField(1, "LED 2", INPUT_FIELD, led2_changed, 5, "Off", "Red", "Green", "Blue", "White");
@@ -112,7 +112,6 @@ public:
         createGroups(2, fieldGroup0, fieldGroup1);
        
         createComplexGroups(0);
-
     }
 };
 

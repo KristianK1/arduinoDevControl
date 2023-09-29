@@ -15,7 +15,7 @@ private:
     void (*onChangeListener)(double);
 
 public:
-    NumericField(int fieldId, String fieldName, double minValue, double maxValue, double step, void func(double))
+    NumericField(int fieldId, String fieldName, double minValue, double maxValue, double step, String prefix, String sufix, void func(double))
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
@@ -37,6 +37,9 @@ public:
         doc["fieldValue"]["minValue"] = mMinValue;
         doc["fieldValue"]["maxValue"] = mMaxValue;
         doc["fieldValue"]["valueStep"] = mStep;
+
+        doc["fieldValue"]["prefix"] = prefix;
+        doc["fieldValue"]["sufix"] = sufix;        
 
         doc["fieldValue"]["fieldDirection"] = "input";
 

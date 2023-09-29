@@ -13,7 +13,7 @@ private:
 public:
     bool connectToWifi()
     {
-        int connectTimeout = 8000;
+        int connectTimeout = 60000;
         int startMillis = millis();
         WiFi.disconnect(true);
         WiFi.begin(ssid.c_str(), password.c_str());
