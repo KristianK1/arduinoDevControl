@@ -85,10 +85,10 @@ private:
         new FieldGroup(1, "LED", 1, field3);
 
     NumericField *potField = 
-        new NumericField(0, "Potentiometer", 0.0, 4095.0, 1.0, "x=", "", emptyFunction);
+        new NumericField(0, "Potentiometer", 0.0, 4095.0, 1.0, "x =", "", emptyFunction);
 
     NumericField *tempField = 
-        new NumericField(1, "Temperature", -100.0, 300.0, 1.0, "T=", "°C", emptyFunction);
+        new NumericField(1, "Temperature", -50.0, 200.0, 0.25, "T=", "°C", emptyFunction);
 
     FieldGroup *fieldGroup2 =
         new FieldGroup(2, "Inputs", 2, potField, tempField);
@@ -101,9 +101,9 @@ private:
 
         Serial.println("oldValue:");
         Serial.println(currentValue);
-        if(currentValue - potValue > 50 || currentValue - potValue < -50){
+        if(currentValue - potValue > 20 || currentValue - potValue < -20){
             // potField->setValue(String(potValue));
-            setTextField(fieldGroup2->getGroupId(), potField->getId(), String(potValue));
+            setNumericField(fieldGroup2->getGroupId(), potField->getId(), potValue);
         }
     }
 
@@ -117,11 +117,9 @@ private:
         Serial.println(currentValue);
 
         float diff = currentValue - tempC;
-        if(diff > 0.1 || diff < -0.1){
-            char stringPayload[7] = {0};
-            dtostrf(tempC, -7, 2, stringPayload);
+        if(diff > 0.5 || diff < -0.5){
             // tempField->setValue(String(stringPayload) + " °C");
-            setTextField(fieldGroup2->getGroupId(), tempField->getId(), String(stringPayload) + " °C");
+            setNumericField(fieldGroup2->getGroupId(), tempField->getId(), tempC);
         }
     }
 
