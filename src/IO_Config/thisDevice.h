@@ -154,6 +154,20 @@ public:
     virtual void setMCfield(int groupId, int fieldId, int value) = 0;
     virtual void setRGBfield(int groupId, int fieldId, int R, int G, int B) = 0;
     virtual void setTextField(int groupId, int fieldId, String value) = 0;
+
+    virtual double getNumericFieldInComplexGroupValue(int groupId, int stateId, int fieldId) = 0;
+    virtual String getTextFieldValueInComplexGroupValue(int groupId, int stateId, int fieldId) = 0;
+    virtual bool getButtonFieldValueInComplexGroupValue(int groupId, int stateId, int fieldId) = 0;
+    virtual int getMCFieldValueInComplexGroupValue(int groupId, int stateId, int fieldId) = 0;
+    virtual RGB getRGBFieldValueInComplexGroupValue(int groupId, int stateId, int fieldId) = 0;
+
+    virtual void setNumericFieldInComplexGroupValue(int groupId, int stateId, int fieldId, double value) = 0;
+    virtual void setButtonFieldInComplexGroupValue(int groupId, int stateId, int fieldId, bool value) = 0;
+    virtual void setMCfieldInComplexGroupValue(int groupId, int stateId, int fieldId, int value) = 0;
+    virtual void setRGBfieldInComplexGroupValue(int groupId, int stateId, int fieldId, int R, int G, int B) = 0;
+    virtual void setTextFieldInComplexGroupValue(int groupId, int stateId, int fieldId, String value) = 0;
+
+    virtual void setComplexGroupState(int groupId, int stateId) = 0;
 };
 
 #endif

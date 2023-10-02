@@ -120,66 +120,106 @@ public:
                     Serial.println(fieldType.c_str());
                 }
             }
-            for(int j = 0; j < group.getNofFields(); j++){
-                BasicField *field = group.getFields()[j];
-                
-                String fieldType = field->getFieldType().c_str();
-                Serial.println("|" + fieldType);
-                if(strcmp(fieldType.c_str(),"numeric") == 0){
-                    void *pointer = field;
-                    NumericField *numericField = (NumericField*)pointer;
-                    double value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
-                    if(numericField->getValue() != value){
-                        Serial.println("proso numeric");
-                        Serial.println(numericField->getValue());
-                        Serial.println(numericField->getFieldType());
-                        Serial.println(numericField->getFieldInfo());
-                        changeFieldValue_numeric(group.getGroupId(), field->getId(), value);
-                    }
-                }
-                else if(strcmp(fieldType.c_str(),"text") == 0){
-                    void *pointer = field;
-                    TextField *textField = (TextField*)pointer;
-                    String value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
-                    if(textField->getText().compareTo(value)){
-                        Serial.println("proso text");
-                        changeFieldValue_text(group.getGroupId(), field->getId(), value);
-                    }
-                }
-                else if(strcmp(fieldType.c_str(),"button") == 0){
-                    void *pointer = field;
-                    ButtonField *buttonField = (ButtonField*)pointer;
+        }
 
-                    bool value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
-                    if(buttonField->getValue() != value){
+        int NofComplexGroups = ComplexGroups::getNumberOfComplexGroups();
+        for(int i = 0; i<NofComplexGroups; i++){
+            ComplexGroup complexGroup = *(ComplexGroups::getComplexGroups()[i]);
+
+            int currentStateId = doc["deviceFieldComplexGroups"][i]["currentState"];
+
+            for(int j = 0; j < complexGroup.getNofStates(); j++){
+                ComplexGroupState state = *(complexGroup.getStates()[j]);
+                int stateId = state.getStateId();
+
+                for(int k = 0; k < state.getNumberOfFields(); k++) {
+                    BasicField *field = state.getFields()[k];
+
+                    String fieldType = field->getFieldType().c_str();
+                    Serial.println("|" + fieldType);
+                    if(strcmp(fieldType.c_str(),"numeric") == 0){
+                        Serial.println("proso numeric");
+                        void *pointer = field;
+                        NumericField *numericField = (NumericField*)pointer;
+                        double value = doc["deviceFieldComplexGroups"][i]["fieldGroupStates"][j]["fields"][k]["fieldValue"]["fieldValue"];
+                        Serial.print("numeric value: ");
+                        Serial.println(value);
+                        if(numericField->getValue() != value){
+                            Serial.println("numeric1_parser");
+                            Serial.println(numericField->getValue());
+                            Serial.println(numericField->getFieldType());
+                            Serial.println(numericField->getFieldInfo());
+                            if(currentStateId == stateId){
+                                changeFieldInComplexGroup_numeric(complexGroup.getComplexGroupId(), state.getStateId(), field->getId(), value);
+                            }
+                        }
+                    }
+                    else if(strcmp(fieldType.c_str(),"text") == 0){
+                        Serial.println("proso text");
+                        void *pointer = field;
+                        TextField *textField = (TextField*)pointer;
+                        String value = doc["deviceFieldComplexGroups"][i]["fieldGroupStates"][j]["fields"][k]["fieldValue"]["fieldValue"];
+                        if(textField->getText().compareTo(value)){
+                            if(currentStateId == stateId){
+                                changeFieldInComplexGroup_text(complexGroup.getComplexGroupId(), state.getStateId(), field->getId(), value);
+                            }
+                        }
+                    }
+                    else if(strcmp(fieldType.c_str(),"button") == 0){
                         Serial.println("proso button");
-                        changeFieldValue_button(group.getGroupId(), field->getId(), value);
+                        void *pointer = field;
+                        ButtonField *buttonField = (ButtonField*)pointer;
+
+                        bool value = doc["deviceFieldComplexGroups"][i]["fieldGroupStates"][j]["fields"][k]["fieldValue"]["fieldValue"];
+                        Serial.print("button value: ");
+                        Serial.println(value);
+                        if(buttonField->getValue() != value){
+                            Serial.println("button1_parser");
+                            if(buttonField->getValue() == false){
+                                Serial.println("0false");
+                            }
+                            else if(buttonField->getValue() == true){
+                                Serial.println("1true");
+                            }
+                            else{
+                                Serial.println("pakao zivi");
+                            }
+
+                            if(currentStateId == stateId){
+                                changeFieldInComplexGroup_button(complexGroup.getComplexGroupId(), state.getStateId(), field->getId(), value);
+                            }
+                        }
                     }
-                }
-                else if(strcmp(fieldType.c_str(),"multipleChoice") == 0){
-                    void *pointer = field;
-                    MultipleChoiceField *multipleChoiceField = (MultipleChoiceField*)pointer;
-                    int value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
-                    if(multipleChoiceField->getValue() != value){
+                    else if(strcmp(fieldType.c_str(),"multipleChoice") == 0){
                         Serial.println("proso mc");
-                        changeFieldValue_multiple(group.getGroupId(), field->getId(), value);
+                        void *pointer = field;
+                        MultipleChoiceField *multipleChoiceField = (MultipleChoiceField*)pointer;
+                        int value = doc["deviceFieldComplexGroups"][i]["fieldGroupStates"][j]["fields"][k]["fieldValue"]["fieldValue"];
+                        if(multipleChoiceField->getValue() != value){
+                            if(currentStateId == stateId){
+                                changeFieldInComplexGroup_multiple(complexGroup.getComplexGroupId(), state.getStateId(), field->getId(), value);
+                            }
+                        }
                     }
-                }
-                else if(strcmp(fieldType.c_str(),"RGB") == 0){
-                    void *pointer = field;
-                    RGBField *rgbField = (RGBField*)pointer;
-                    int valueR = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["R"];
-                    int valueG = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["G"];
-                    int valueB = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["B"];
-                    RGB currentValue = rgbField->getValue();
-                    if(currentValue.R != valueR || currentValue.G != valueG || currentValue.B != valueB){
-                    Serial.println("proso rgb");
-                        changeFieldValue_rgb(group.getGroupId(), field->getId(), valueR, valueG, valueB);
+                    else if(strcmp(fieldType.c_str(),"RGB") == 0){
+                        Serial.println("proso rgb");
+                        void *pointer = field;
+                        RGBField *rgbField = (RGBField*)pointer;
+                        int valueR = doc["deviceFieldComplexGroups"][i]["fieldGroupStates"][j]["fields"][k]["fieldValue"]["R"];
+                        int valueG = doc["deviceFieldComplexGroups"][i]["fieldGroupStates"][j]["fields"][k]["fieldValue"]["G"];
+                        int valueB = doc["deviceFieldComplexGroups"][i]["fieldGroupStates"][j]["fields"][k]["fieldValue"]["B"];
+                        RGB currentValue = rgbField->getValue();
+                        if(currentValue.R != valueR || currentValue.G != valueG || currentValue.B != valueB){
+                            if(currentStateId == stateId){
+                                changeFieldInComplexGroup_rgb(complexGroup.getComplexGroupId(), state.getStateId(), field->getId(), valueR, valueG, valueB);
+                            }
+                        }
                     }
-                }
-                else{
-                    Serial.println("KRIVI TIP FIELDA");
-                    Serial.println(fieldType.c_str());
+                    else{
+                        Serial.println("KRIVI TIP FIELDA");
+                        Serial.println(fieldType.c_str());
+                    }
+
                 }
             }
         }
@@ -419,6 +459,106 @@ public:
         String body;
         serializeJson(doc, body);
         httpPost("API/device/changeField/device", body);
+    }
+
+    ////////////////////////////////////
+
+    double getNumericFieldValue(int groupId, int stateId,int fieldId){
+        BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
+        NumericField *fieldAdd = (NumericField *)field;
+        return fieldAdd->getValue();
+    }
+    String getTextFieldValue(int groupId, int stateId,int fieldId){
+        BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
+        TextField *fieldAdd = (TextField *)field;
+        return fieldAdd->getText();
+    }
+    bool getButtonFieldValue(int groupId, int stateId,int fieldId){
+        BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
+        ButtonField *fieldAdd = (ButtonField *)field;
+        return fieldAdd->getValue();
+    }
+    int getMCFieldValue(int groupId, int stateId,int fieldId){
+        BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
+        MultipleChoiceField *fieldAdd = (MultipleChoiceField *)field;
+        return fieldAdd->getValue();
+    }   
+    RGB getRGBFieldValue(int groupId, int stateId, int fieldId){
+        BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
+        RGBField *fieldAdd = (RGBField *)field;
+        return fieldAdd->getValue();
+    }
+
+    virtual void setNumericField(int groupId, int stateId, int fieldId, double value) {
+        DynamicJsonDocument doc(1024);
+        doc["deviceKey"] = deviceKey;
+        doc["groupId"]   = groupId;
+        doc["stateId"]   = stateId;
+        doc["fieldId"] = fieldId;
+        doc["fieldValue"] = value;
+        String body;
+        serializeJson(doc, body);
+        httpPost("API/device/fieldInComplexGroupState/device", body);
+    }
+
+    virtual void setButtonField(int groupId, int stateId, int fieldId, bool value){
+        DynamicJsonDocument doc(1024);
+        doc["deviceKey"] = deviceKey;
+        doc["groupId"]   = groupId;
+        doc["stateId"]   = stateId;
+        doc["fieldId"] = fieldId;
+        doc["fieldValue"] = value;
+        String body;
+        serializeJson(doc, body);
+        httpPost("API/device/fieldInComplexGroupState/device", body);
+    }
+
+    virtual void setMCfield(int groupId, int stateId, int fieldId, int value){
+        DynamicJsonDocument doc(1024);
+        doc["deviceKey"] = deviceKey;
+        doc["groupId"]   = groupId;
+        doc["stateId"]   = stateId;
+        doc["fieldId"] = fieldId;
+        doc["fieldValue"] = value;
+        String body;
+        serializeJson(doc, body);
+        httpPost("API/device/fieldInComplexGroupState/device", body);
+    }
+
+    virtual void setRGBfield(int groupId, int stateId, int fieldId, int R, int G, int B){
+        DynamicJsonDocument doc(1024);
+        doc["deviceKey"] = deviceKey;
+        doc["groupId"]   = groupId;
+        doc["stateId"]   = stateId;
+        doc["fieldId"] = fieldId;
+        doc["fieldValue"]["R"] = R;
+        doc["fieldValue"]["G"] = G;
+        doc["fieldValue"]["B"] = B;
+        String body;
+        serializeJson(doc, body);
+        httpPost("API/device/fieldInComplexGroupState/device", body);
+    }
+
+    virtual void setTextField(int groupId, int stateId, int fieldId, String value){
+        DynamicJsonDocument doc(1024);
+        doc["deviceKey"] = deviceKey;
+        doc["groupId"]   = groupId;
+        doc["stateId"]   = stateId;
+        doc["fieldId"] = fieldId;
+        doc["fieldValue"] = value;
+        String body;
+        serializeJson(doc, body);
+        httpPost("API/device/fieldInComplexGroupState/device", body);
+    }
+
+    virtual void setComplexGroupState(int groupId, int stateId) {
+        DynamicJsonDocument doc(1024);
+        doc["deviceKey"] = deviceKey;
+        doc["groupId"] = groupId;
+        doc["state"] = stateId;
+        String body;
+        serializeJson(doc, body);
+        httpPost("API/device/changeComplexGroupState/device", body);
     }
 
     virtual void httpPost(String sublink, String body) = 0;
