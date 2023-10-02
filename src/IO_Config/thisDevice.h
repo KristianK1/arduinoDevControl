@@ -116,6 +116,8 @@ private:
         float currentValue = tempField->getValue();
         Serial.println(currentValue);
 
+        tempC = int(tempC / tempField->getStep()) * tempField->getStep();
+
         float diff = currentValue - tempC;
         if(diff > 0.5 || diff < -0.5){
             // tempField->setValue(String(stringPayload) + " °C");
