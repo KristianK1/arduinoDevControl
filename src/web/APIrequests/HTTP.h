@@ -14,8 +14,8 @@ class HTTP
 {
 private:
     HTTPClient http;
-    String basicLink = "https://devcontrol-backend.onrender.com/";
-    // String basicLink = "http://192.168.1.239:8000/";
+    // String basicLink = "https://devcontrol-backend.onrender.com/";
+    String basicLink = "http://192.168.1.70:8000/";
 
 public:
     HTTPresult get(String subLink)

@@ -30,9 +30,9 @@ static String newMessageHolder = "";
 class WS
 {
 private:
-    String basicLink = "wss://devcontrol-backend.onrender.com/";
+    // String basicLink = "wss://devcontrol-backend.onrender.com/";
     // String basicLink = "wss://devcontrol.herokuapp.com/";
-    // String basicLink = "ws://192.168.1.239:8000";
+    String basicLink = "ws://192.168.1.70:8000";
     
     WSSConnection *connection;
     int messagesLastChecked = 0;
@@ -51,7 +51,7 @@ public:
         }
         else
         {
-            if (millis() - connection->timeConnected > 4.8 * 60 * 1000) // set to 4.99 mins later
+            if (millis() - connection->timeConnected >  30 * 1000) // set to 4.99 mins later
             {
                 startNextConnection();
             }
@@ -60,7 +60,9 @@ public:
 
     void startFirstConnection()
     {
+        Serial.println("firstConn_X1");
         connection = (WSSConnection *)calloc(1, sizeof(WSSConnection));
+        Serial.println("firstConn_X2");
         bool connected = connectToWS(connection);
         if (connected)
         {
@@ -68,14 +70,17 @@ public:
         }
         else
         {
-            delete (connection);
+            disconnectWS(*connection);
+            free (connection);
             connection = NULL;
         }
     }
 
     void startNextConnection()
     {
+        Serial.println("nextConn_X1");
         connection->nextConnection = (WSSConnection *)calloc(1, sizeof(WSSConnection));
+        Serial.println("nextConn_X2");
         bool connected = connectToWS(connection->nextConnection);
         if (connected)
         {
@@ -83,11 +88,11 @@ public:
             disconnectWS(*connection);
             wSSConnection *connectionTemp = connection;
             connection = connection->nextConnection;
-            delete (connectionTemp);
+            free (connectionTemp);
         }
         else
         {
-            delete (connection->nextConnection);
+            free (connection->nextConnection);
         }
     }
 
@@ -97,30 +102,38 @@ public:
             .uri = basicLink.c_str(),
         };
         ws_cfg.buffer_size = 10000;
+        Serial.println("firstConn_X3");
         esp_websocket_client_handle_t newHandle = esp_websocket_client_init(&ws_cfg);
+        Serial.println("firstConn_X4");
         esp_websocket_register_events(newHandle, WEBSOCKET_EVENT_DATA, websocket_event_handler, (void *)newHandle);
+        Serial.println("firstConn_X5");
         esp_err_t x = esp_websocket_client_start(newHandle);
+        Serial.println("firstConn_X6");
         int startedConnect = millis();
         while (esp_websocket_client_is_connected(newHandle) == false && millis() - startedConnect < 10000)
         {
-            delay(100);
-            // Serial.println("connecting to WSS");
+            delay(1000);
+            Serial.println("connecting to WSS");
         }
         if (esp_websocket_client_is_connected(newHandle) == false)
         {
             Serial.println("failed to connect");
             return false;
         }
+        Serial.println("not failed???");
+
         WSSConnection newConnection;
         newConn->handle = newHandle;
         newConn->timeConnected = millis();
         newConn->nextConnection = NULL;
+        Serial.println("not failed???2");
         return true;
     }
 
     void disconnectWS(WSSConnection conn)
     {
         esp_websocket_client_stop(conn.handle);
+        esp_websocket_client_destroy(conn.handle);
     }
 
     bool isConnected()
@@ -166,16 +179,16 @@ public:
                 break;
             case WEBSOCKET_EVENT_DATA:
                 Serial.println("WEBSOCKET_EVENT_DATA");
-                Serial.println(data->op_code);
-                Serial.println(data->payload_offset);
+                // Serial.println(data->op_code);
+                // Serial.println(data->payload_offset);
                 newData = (char *)(data->data_ptr);
                 // Serial.println("Received=%.*s", data->data_len, (char *)data->data_ptr);
                 newData = newData.substring(0, data ->payload_len);
-                Serial.println(newData.c_str());
+                // Serial.println(newData.c_str());
                 newDataBuffer = newData.c_str();
                 newData = "";
                 Serial.println("result");
-                Serial.println(newDataBuffer.c_str());
+                // Serial.println(newDataBuffer.c_str());
                 newMessageHolder = newDataBuffer.c_str();
                 break;
             case WEBSOCKET_EVENT_ERROR:

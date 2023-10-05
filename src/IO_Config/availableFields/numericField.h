@@ -15,7 +15,7 @@ private:
     void (*onChangeListener)(double);
 
 public:
-    NumericField(int fieldId, String fieldName, double minValue, double maxValue, double step, String prefix, String sufix, void func(double))
+    NumericField(int fieldId, String fieldName, int direction, double minValue, double maxValue, double step, String prefix, String sufix, void func(double))
     {
         mFieldId = fieldId;
         mFieldName = fieldName;
@@ -41,8 +41,14 @@ public:
         doc["fieldValue"]["prefix"] = prefix;
         doc["fieldValue"]["sufix"] = sufix;        
 
-        doc["fieldValue"]["fieldDirection"] = "input";
-
+        if (direction == INPUT_FIELD)
+        {
+            doc["fieldValue"]["fieldDirection"] = "input";
+        }
+        else if (direction == OUTPUT_FIELD)
+        {
+            doc["fieldValue"]["fieldDirection"] = "output";
+        }
         String myString;
         serializeJson(doc, myString);
         fieldInformation = myString;

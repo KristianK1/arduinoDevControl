@@ -84,11 +84,21 @@ void changeState(){
     Serial.println("Changed state");
 }
 
+void led_changed(bool value)
+{
+    digitalWrite(23, value);
+}
+
+void emptyFunction(double data){
+
+}
+
+
 class ThisDevice : protected FieldGroups, protected ComplexGroups
 {
 private:
     NumericField *brightnessField = 
-        new NumericField(0, "Svjetlina", 0.0, 25.0, 1, "", "", svjetlinaUpdate);
+        new NumericField(0, "Svjetlina", INPUT_FIELD, 0.0, 25.0, 1, "", "", svjetlinaUpdate);
 
     ComplexGroupState *brightnessState = new ComplexGroupState(0, "Svjetlina", 1, brightnessField);
 
@@ -115,10 +125,25 @@ private:
 
     ComplexGroup *complexGroup = new ComplexGroup(0, "NOVA GRUPA", changeState, 4, brightnessState, colorSelectState, rgbState, inidividualRgbState);
 
+
+    ButtonField *blueLed =
+        new ButtonField(1, "Blue LED", INPUT_FIELD, false, led_changed);
+
+    FieldGroup *fieldGroup1 =
+        new FieldGroup(1, "LED", 1, blueLed);
+
+    NumericField *potField = 
+        new NumericField(0, "Potentiometer", OUTPUT_FIELD, 0.0, 4095.0, 1.0, "x =", "", emptyFunction);
+
+    NumericField *tempField = 
+        new NumericField(1, "Temperature",  OUTPUT_FIELD, -50.0, 200.0, 0.25, "T=", "°C", emptyFunction);
+
+    FieldGroup *fieldGroup2 =
+        new FieldGroup(2, "Inputs", 2, potField, tempField);
 public:
     void setupFields()
     {
-        createGroups(0);
+        createGroups(2, fieldGroup1, fieldGroup2);
        
         pixels.begin();
         pinMode(23, OUTPUT);
@@ -127,9 +152,41 @@ public:
         createComplexGroups(1, complexGroup);
     }
 
+ void potentiometerLoop(){
+        int potValue = analogRead(34); //12bit
+        // Serial.println("potValue:");
+        // Serial.println(potValue);
+        double currentValue = potField->getValue();
+
+        // Serial.println("oldValue:");
+        // Serial.println(currentValue);
+        if(currentValue - potValue > 20 || currentValue - potValue < -20){
+            // potField->setValue(String(potValue));
+            setNumericField(fieldGroup2->getGroupId(), potField->getId(), potValue);
+        }
+    }
+
+    void temperatureLoop(){
+        sensors.begin();
+        sensors.requestTemperatures(); // Send the command to get temperatures
+        float tempC = sensors.getTempCByIndex(0);
+        // Serial.println(tempC);
+
+        float currentValue = tempField->getValue();
+        // Serial.println(currentValue);
+
+        tempC = int(tempC / tempField->getStep()) * tempField->getStep();
+
+        float diff = currentValue - tempC;
+        if(diff > 0.5 || diff < -0.5){
+            // tempField->setValue(String(stringPayload) + " °C");
+            setNumericField(fieldGroup2->getGroupId(), tempField->getId(), tempC);
+        }
+    }
+
     void loop(){
-        // potentiometerLoop();
-        // temperatureLoop();
+        potentiometerLoop();
+        temperatureLoop();
     }
 
     virtual double getNumericFieldValue(int groupId, int fieldId) = 0;

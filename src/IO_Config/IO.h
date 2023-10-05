@@ -47,24 +47,15 @@ public:
                 BasicField *field = group.getFields()[j];
                 
                 String fieldType = field->getFieldType().c_str();
-                Serial.println("|" + fieldType);
                 if(strcmp(fieldType.c_str(),"numeric") == 0){
-                    Serial.println("proso numeric");
                     void *pointer = field;
                     NumericField *numericField = (NumericField*)pointer;
                     double value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
-                    Serial.print("numeric value: ");
-                    Serial.println(value);
                     if(numericField->getValue() != value){
-                        Serial.println("numeric1_parser");
-                        Serial.println(numericField->getValue());
-                        Serial.println(numericField->getFieldType());
-                        Serial.println(numericField->getFieldInfo());
                         changeFieldValue_numeric(group.getGroupId(), field->getId(), value);
                     }
                 }
                 else if(strcmp(fieldType.c_str(),"text") == 0){
-                    Serial.println("proso text");
                     void *pointer = field;
                     TextField *textField = (TextField*)pointer;
                     String value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
@@ -73,29 +64,15 @@ public:
                     }
                 }
                 else if(strcmp(fieldType.c_str(),"button") == 0){
-                    Serial.println("proso button");
                     void *pointer = field;
                     ButtonField *buttonField = (ButtonField*)pointer;
 
                     bool value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
-                    Serial.print("button value: ");
-                    Serial.println(value);
                     if(buttonField->getValue() != value){
-                        Serial.println("button1_parser");
-                        if(buttonField->getValue() == false){
-                            Serial.println("0false");
-                        }
-                        else if(buttonField->getValue() == true){
-                            Serial.println("1true");
-                        }
-                        else{
-                            Serial.println("pakao zivi");
-                        }
                         changeFieldValue_button(group.getGroupId(), field->getId(), value);
                     }
                 }
                 else if(strcmp(fieldType.c_str(),"multipleChoice") == 0){
-                    Serial.println("proso mc");
                     void *pointer = field;
                     MultipleChoiceField *multipleChoiceField = (MultipleChoiceField*)pointer;
                     int value = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["fieldValue"];
@@ -104,7 +81,6 @@ public:
                     }
                 }
                 else if(strcmp(fieldType.c_str(),"RGB") == 0){
-                    Serial.println("proso rgb");
                     void *pointer = field;
                     RGBField *rgbField = (RGBField*)pointer;
                     int valueR = doc["deviceFieldGroups"][i]["fields"][j]["fieldValue"]["R"];
@@ -138,26 +114,17 @@ public:
                     BasicField *field = state.getFields()[k];
 
                     String fieldType = field->getFieldType().c_str();
-                    Serial.println("|" + fieldType);
                     if(strcmp(fieldType.c_str(),"numeric") == 0){
-                        Serial.println("proso numeric");
                         void *pointer = field;
                         NumericField *numericField = (NumericField*)pointer;
                         double value = doc["deviceFieldComplexGroups"][i]["fieldGroupStates"][j]["fields"][k]["fieldValue"]["fieldValue"];
-                        Serial.print("numeric value: ");
-                        Serial.println(value);
                         if(numericField->getValue() != value){
-                            Serial.println("numeric1_parser");
-                            Serial.println(numericField->getValue());
-                            Serial.println(numericField->getFieldType());
-                            Serial.println(numericField->getFieldInfo());
                             if(currentStateId == stateId){
                                 changeFieldInComplexGroup_numeric(complexGroup.getComplexGroupId(), state.getStateId(), field->getId(), value);
                             }
                         }
                     }
                     else if(strcmp(fieldType.c_str(),"text") == 0){
-                        Serial.println("proso text");
                         void *pointer = field;
                         TextField *textField = (TextField*)pointer;
                         String value = doc["deviceFieldComplexGroups"][i]["fieldGroupStates"][j]["fields"][k]["fieldValue"]["fieldValue"];
@@ -168,32 +135,17 @@ public:
                         }
                     }
                     else if(strcmp(fieldType.c_str(),"button") == 0){
-                        Serial.println("proso button");
                         void *pointer = field;
                         ButtonField *buttonField = (ButtonField*)pointer;
 
                         bool value = doc["deviceFieldComplexGroups"][i]["fieldGroupStates"][j]["fields"][k]["fieldValue"]["fieldValue"];
-                        Serial.print("button value: ");
-                        Serial.println(value);
                         if(buttonField->getValue() != value){
-                            Serial.println("button1_parser");
-                            if(buttonField->getValue() == false){
-                                Serial.println("0false");
-                            }
-                            else if(buttonField->getValue() == true){
-                                Serial.println("1true");
-                            }
-                            else{
-                                Serial.println("pakao zivi");
-                            }
-
                             if(currentStateId == stateId){
                                 changeFieldInComplexGroup_button(complexGroup.getComplexGroupId(), state.getStateId(), field->getId(), value);
                             }
                         }
                     }
                     else if(strcmp(fieldType.c_str(),"multipleChoice") == 0){
-                        Serial.println("proso mc");
                         void *pointer = field;
                         MultipleChoiceField *multipleChoiceField = (MultipleChoiceField*)pointer;
                         int value = doc["deviceFieldComplexGroups"][i]["fieldGroupStates"][j]["fields"][k]["fieldValue"]["fieldValue"];
@@ -204,7 +156,6 @@ public:
                         }
                     }
                     else if(strcmp(fieldType.c_str(),"RGB") == 0){
-                        Serial.println("proso rgb");
                         void *pointer = field;
                         RGBField *rgbField = (RGBField*)pointer;
                         int valueR = doc["deviceFieldComplexGroups"][i]["fieldGroupStates"][j]["fields"][k]["fieldValue"]["R"];
