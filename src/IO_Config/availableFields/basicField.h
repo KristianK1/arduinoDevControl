@@ -26,9 +26,7 @@ public:
     }
 
     String getFieldInfo(){
-        Serial.println("crashes");
         Serial.println(fieldInformation.c_str());
-        Serial.println("crashes2");
         return fieldInformation;
     }
 

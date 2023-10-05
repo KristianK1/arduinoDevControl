@@ -143,6 +143,37 @@ public:
         {
             onStateChangeListener();
             mCurrentState = n;
+
+            ComplexGroupState *currentState = getStates()[mCurrentState];
+
+            for(int i = 0; i < currentState->getNumberOfFields(); i++){
+                BasicField *field = currentState->getFields()[i];
+                void *pointer = field;
+                
+                String fieldType = field->getFieldType().c_str();
+                
+                if(strcmp(fieldType.c_str(),"numeric") == 0){
+                    NumericField *typeField = (NumericField*)pointer;
+                    typeField->refresh();
+                }
+                else if(strcmp(fieldType.c_str(),"text") == 0){
+                    TextField *typeField = (TextField*)pointer;
+                    typeField->refresh();
+                }
+                else if(strcmp(fieldType.c_str(),"button") == 0){
+                    ButtonField *typeField = (ButtonField*)pointer;
+                    typeField->refresh();
+                }
+                else if(strcmp(fieldType.c_str(),"multipleChoice") == 0){
+                    MultipleChoiceField *typeField = (MultipleChoiceField*)pointer;
+                    typeField->refresh();
+                }
+                else if(strcmp(fieldType.c_str(),"RGB") == 0){
+                    RGBField *typeField = (RGBField*)pointer;
+                    typeField->refresh();
+                }
+                
+            }
         }
     }
 

@@ -51,6 +51,7 @@ public:
     void registerDevice()
     {
         String data = IO::getTotalDeviceString();
+        Serial.println("TOTAL DEVICE STRING \n\n");
         Serial.println(data);
         HTTP::post("API/device/registerDeviceData", data);
     }

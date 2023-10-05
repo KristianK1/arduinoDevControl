@@ -29,7 +29,7 @@ public:
             info = info + "\"deviceFieldComplexGroups\":" + ComplexGroups::getInfo();
         }
         info = info + "}";
-        // Serial.println(info);
+        Serial.println(info);
         return info;
     }
 
@@ -128,10 +128,12 @@ public:
 
             int currentStateId = doc["deviceFieldComplexGroups"][i]["currentState"];
 
+            complexGroup.changeState(currentStateId);
+
             for(int j = 0; j < complexGroup.getNofStates(); j++){
                 ComplexGroupState state = *(complexGroup.getStates()[j]);
                 int stateId = state.getStateId();
-
+        
                 for(int k = 0; k < state.getNumberOfFields(); k++) {
                     BasicField *field = state.getFields()[k];
 
@@ -463,33 +465,33 @@ public:
 
     ////////////////////////////////////
 
-    double getNumericFieldValue(int groupId, int stateId,int fieldId){
+    double getNumericFieldInComplexGroupValue(int groupId, int stateId,int fieldId){
         BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
         NumericField *fieldAdd = (NumericField *)field;
         return fieldAdd->getValue();
     }
-    String getTextFieldValue(int groupId, int stateId,int fieldId){
+    String getTextFieldValueInComplexGroupValue(int groupId, int stateId,int fieldId){
         BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
         TextField *fieldAdd = (TextField *)field;
         return fieldAdd->getText();
     }
-    bool getButtonFieldValue(int groupId, int stateId,int fieldId){
+    bool getButtonFieldValueInComplexGroupValue(int groupId, int stateId,int fieldId){
         BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
         ButtonField *fieldAdd = (ButtonField *)field;
         return fieldAdd->getValue();
     }
-    int getMCFieldValue(int groupId, int stateId,int fieldId){
+    int getMCFieldValueInComplexGroupValue(int groupId, int stateId,int fieldId){
         BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
         MultipleChoiceField *fieldAdd = (MultipleChoiceField *)field;
         return fieldAdd->getValue();
     }   
-    RGB getRGBFieldValue(int groupId, int stateId, int fieldId){
+    RGB getRGBFieldValueInComplexGroupValue(int groupId, int stateId, int fieldId){
         BasicField *field = findFieldinComplexGroup(groupId, stateId, fieldId);
         RGBField *fieldAdd = (RGBField *)field;
         return fieldAdd->getValue();
     }
 
-    virtual void setNumericField(int groupId, int stateId, int fieldId, double value) {
+    virtual void setNumericFieldInComplexGroupValue(int groupId, int stateId, int fieldId, double value) {
         DynamicJsonDocument doc(1024);
         doc["deviceKey"] = deviceKey;
         doc["groupId"]   = groupId;
@@ -501,7 +503,7 @@ public:
         httpPost("API/device/fieldInComplexGroupState/device", body);
     }
 
-    virtual void setButtonField(int groupId, int stateId, int fieldId, bool value){
+    virtual void setButtonFieldInComplexGroupValue(int groupId, int stateId, int fieldId, bool value){
         DynamicJsonDocument doc(1024);
         doc["deviceKey"] = deviceKey;
         doc["groupId"]   = groupId;
@@ -513,7 +515,7 @@ public:
         httpPost("API/device/fieldInComplexGroupState/device", body);
     }
 
-    virtual void setMCfield(int groupId, int stateId, int fieldId, int value){
+    virtual void setMCfieldInComplexGroupValue(int groupId, int stateId, int fieldId, int value){
         DynamicJsonDocument doc(1024);
         doc["deviceKey"] = deviceKey;
         doc["groupId"]   = groupId;
@@ -525,7 +527,7 @@ public:
         httpPost("API/device/fieldInComplexGroupState/device", body);
     }
 
-    virtual void setRGBfield(int groupId, int stateId, int fieldId, int R, int G, int B){
+    virtual void setRGBfieldInComplexGroupValue(int groupId, int stateId, int fieldId, int R, int G, int B){
         DynamicJsonDocument doc(1024);
         doc["deviceKey"] = deviceKey;
         doc["groupId"]   = groupId;
@@ -539,7 +541,7 @@ public:
         httpPost("API/device/fieldInComplexGroupState/device", body);
     }
 
-    virtual void setTextField(int groupId, int stateId, int fieldId, String value){
+    virtual void setTextFieldInComplexGroupValue(int groupId, int stateId, int fieldId, String value){
         DynamicJsonDocument doc(1024);
         doc["deviceKey"] = deviceKey;
         doc["groupId"]   = groupId;

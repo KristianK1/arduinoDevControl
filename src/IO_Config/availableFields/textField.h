@@ -57,6 +57,10 @@ public:
         mValue = value;
     }
 
+    void refresh(){
+        onChangeListener(getText());
+    }
+
     int getId()
     {
         return BasicField::getId();

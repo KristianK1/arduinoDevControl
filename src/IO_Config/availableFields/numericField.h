@@ -77,6 +77,10 @@ public:
         onChangeListener(value);
     }
 
+    void refresh(){
+        onChangeListener(getValue());
+    }
+
     int getId()
     {
         return BasicField::getId();

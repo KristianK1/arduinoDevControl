@@ -15,132 +15,121 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-Adafruit_NeoPixel pixels(3, 13, NEO_GRB + NEO_KHZ800);
+#define Npixels 3
+Adafruit_NeoPixel pixels(Npixels, 13, NEO_GRB + NEO_KHZ800);
 OneWire oneWire(4); 
 DallasTemperature sensors(&oneWire);
 
-void led1_changed(double value){
-    int brightness = (int) (pow(1.12,value) - 1)*15.8;
-    pixels.setPixelColor(0, pixels.Color(brightness,brightness,brightness));
-    pixels.show();
-}
-
-void led2_changed(int value){
-    switch(value){
-        case 0: 
-            pixels.setPixelColor(1, pixels.Color(0,0,0));
-        break;
-        case 1: 
-            pixels.setPixelColor(1, pixels.Color(255,0,0));
-        break;
-        case 2: 
-            pixels.setPixelColor(1, pixels.Color(0,255,0));
-        break;
-        case 3: 
-            pixels.setPixelColor(1, pixels.Color(0,0,255));
-        break;
-        case 4: 
-            pixels.setPixelColor(1, pixels.Color(255,255,255));
-        break;
+void svjetlinaUpdate(double value){
+    int brightness = (int) ((pow(1.12,value) - 1)*15.8);
+    
+    for(int i = 0; i<Npixels; i++) {
+        pixels.setPixelColor(i, pixels.Color(brightness,brightness,brightness));
     }
     pixels.show();
 }
 
-void led3_changed(int r, int g, int b){
-    r = (int)pow(1.0235,r)-1;
-    g = (int)pow(1.0235,g)-1;
-    b = (int)pow(1.0235,b)-1;
+void selectColor(int value){
+    for(int i=0; i<Npixels; i++){
+        switch(value){
+            case 0: 
+                pixels.setPixelColor(i, pixels.Color(0,0,0));
+            break;
+            case 1: 
+                pixels.setPixelColor(i, pixels.Color(255,0,0));
+            break;
+            case 2: 
+                pixels.setPixelColor(i, pixels.Color(0,255,0));
+            break;
+            case 3: 
+                pixels.setPixelColor(i, pixels.Color(0,0,255));
+            break;
+            case 4: 
+                pixels.setPixelColor(i, pixels.Color(255,255,255));
+            break;
+        }
+    }
+    pixels.show();
+}
+
+void selectRGB(int r, int g, int b){
+    // r = (int)pow(1.0235,r)-1;
+    // g = (int)pow(1.0235,g)-1;
+    // b = (int)pow(1.0235,b)-1;
+    for(int i = 0; i<Npixels; i++){
+        pixels.setPixelColor(i, pixels.Color(r,g,b));
+    }
+    pixels.show();
+}
+
+void selectRGB1(int r, int g, int b)
+{
+    pixels.setPixelColor(0, pixels.Color(r,g,b));
+    pixels.show();
+}
+
+void selectRGB2(int r, int g, int b)
+{
+    pixels.setPixelColor(1, pixels.Color(r,g,b));
+    pixels.show();
+}
+
+void selectRGB3(int r, int g, int b)
+{
     pixels.setPixelColor(2, pixels.Color(r,g,b));
     pixels.show();
 }
 
-void led4_changed(bool value)
-{
-    digitalWrite(23, value);
-}
-
-void emptyFunction(double data){
-
+void changeState(){
+    Serial.println("Changed state");
 }
 
 class ThisDevice : protected FieldGroups, protected ComplexGroups
 {
 private:
-    NumericField *field0 = 
-        new NumericField(0, "LED 1", 0.0, 25.0, 1, "", "", led1_changed);
+    NumericField *brightnessField = 
+        new NumericField(0, "Svjetlina", 0.0, 25.0, 1, "", "", svjetlinaUpdate);
 
-    MultipleChoiceField *field1 =
-        new MultipleChoiceField(1, "LED 2", INPUT_FIELD, led2_changed, 5, "Off", "Red", "Green", "Blue", "White");
+    ComplexGroupState *brightnessState = new ComplexGroupState(0, "Svjetlina", 1, brightnessField);
 
-    RGBField *field2 =
-        new RGBField(2, "LED 3", 0, 0, 0, led3_changed);
+    MultipleChoiceField *colorSelectField =
+        new MultipleChoiceField(1, "Boje", INPUT_FIELD, selectColor, 5, "Off", "Red", "Green", "Blue", "White");
+
+    ComplexGroupState *colorSelectState = new ComplexGroupState(1, "Boje", 1, colorSelectField);
     
-    FieldGroup *fieldGroup0 =
-        new FieldGroup(0, "WS2812b", 3, field0, field1, field2);
+    RGBField *rgbField =
+        new RGBField(2, "Kod boje", 0, 0, 0, selectRGB);
+    
+    ComplexGroupState *rgbState = new ComplexGroupState(2, "Kod boje", 1, rgbField);
 
-    ButtonField *field3 =
-        new ButtonField(1, "Blue LED", INPUT_FIELD, false, led4_changed);
+    RGBField *rgbField1 =
+        new RGBField(3, "LED 1", 0, 0, 0, selectRGB1);
 
-    FieldGroup *fieldGroup1 =
-        new FieldGroup(1, "LED", 1, field3);
+    RGBField *rgbField2 =
+        new RGBField(4, "LED 2", 0, 0, 0, selectRGB2);
+        
+    RGBField *rgbField3 =
+        new RGBField(5, "LED 3", 0, 0, 0, selectRGB3);
 
-    NumericField *potField = 
-        new NumericField(0, "Potentiometer", 0.0, 4095.0, 1.0, "x =", "", emptyFunction);
+    ComplexGroupState *inidividualRgbState = new ComplexGroupState(3, "Individualni RGB", 3, rgbField1, rgbField2, rgbField3);
 
-    NumericField *tempField = 
-        new NumericField(1, "Temperature", -50.0, 200.0, 0.25, "T=", "°C", emptyFunction);
-
-    FieldGroup *fieldGroup2 =
-        new FieldGroup(2, "Inputs", 2, potField, tempField);
-
-    void potentiometerLoop(){
-        int potValue = analogRead(34); //12bit
-        Serial.println("potValue:");
-        Serial.println(potValue);
-        double currentValue = potField->getValue();
-
-        Serial.println("oldValue:");
-        Serial.println(currentValue);
-        if(currentValue - potValue > 20 || currentValue - potValue < -20){
-            // potField->setValue(String(potValue));
-            setNumericField(fieldGroup2->getGroupId(), potField->getId(), potValue);
-        }
-    }
-
-    void temperatureLoop(){
-        sensors.begin();
-        sensors.requestTemperatures(); // Send the command to get temperatures
-        float tempC = sensors.getTempCByIndex(0);
-        Serial.println(tempC);
-
-        float currentValue = tempField->getValue();
-        Serial.println(currentValue);
-
-        tempC = int(tempC / tempField->getStep()) * tempField->getStep();
-
-        float diff = currentValue - tempC;
-        if(diff > 0.5 || diff < -0.5){
-            // tempField->setValue(String(stringPayload) + " °C");
-            setNumericField(fieldGroup2->getGroupId(), tempField->getId(), tempC);
-        }
-    }
+    ComplexGroup *complexGroup = new ComplexGroup(0, "NOVA GRUPA", changeState, 4, brightnessState, colorSelectState, rgbState, inidividualRgbState);
 
 public:
     void setupFields()
     {
-        createGroups(2, fieldGroup0, fieldGroup1);
+        createGroups(0);
        
         pixels.begin();
         pinMode(23, OUTPUT);
         sensors.begin();
         
-        createGroups(3, fieldGroup0, fieldGroup1, fieldGroup2);
-        createComplexGroups(0);
+        createComplexGroups(1, complexGroup);
     }
 
     void loop(){
-        potentiometerLoop();
-        temperatureLoop();
+        // potentiometerLoop();
+        // temperatureLoop();
     }
 
     virtual double getNumericFieldValue(int groupId, int fieldId) = 0;

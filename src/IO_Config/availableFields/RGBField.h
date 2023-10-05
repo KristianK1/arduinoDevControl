@@ -96,6 +96,11 @@ public:
         onChangeListener(R, G, B);
     }
 
+    void refresh(){
+        onChangeListener(getValue().R, getValue().G, getValue().B);
+    }
+
+
     int getId()
     {
         return BasicField::getId();
