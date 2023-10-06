@@ -30,9 +30,9 @@ static String newMessageHolder = "";
 class WS
 {
 private:
-    // String basicLink = "wss://devcontrol-backend.onrender.com/";
+    String basicLink = "wss://devcontrol-backend.onrender.com/";
     // String basicLink = "wss://devcontrol.herokuapp.com/";
-    String basicLink = "ws://192.168.1.70:8000";
+    // String basicLink = "ws://192.168.1.70:8000";
     
     WSSConnection *connection;
     int messagesLastChecked = 0;
@@ -51,7 +51,7 @@ public:
         }
         else
         {
-            if (millis() - connection->timeConnected >  30 * 1000) // set to 4.99 mins later
+            if (millis() - connection->timeConnected >  (4*60 + 30) * 1000) // set to 4.99 mins later
             {
                 startNextConnection();
             }
