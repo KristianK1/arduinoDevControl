@@ -92,6 +92,7 @@ public:
         }
         else
         {
+            disconnectWS(*(connection->nextConnection));
             free (connection->nextConnection);
         }
     }
