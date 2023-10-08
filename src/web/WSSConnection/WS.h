@@ -85,8 +85,8 @@ public:
         if (connected)
         {
             sendfirstWSSMessage(*connection->nextConnection);
-            disconnectWS(*connection);
             wSSConnection *connectionTemp = connection;
+            disconnectWS(*connection);
             connection = connection->nextConnection;
             free (connectionTemp);
         }

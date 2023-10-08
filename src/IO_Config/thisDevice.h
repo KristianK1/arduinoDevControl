@@ -12,9 +12,13 @@
 
 #include "ArduinoJson.h"
 #include <Adafruit_NeoPixel.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
-#define Npixels 4
-Adafruit_NeoPixel pixels(Npixels, 12, NEO_GRB + NEO_KHZ800);
+#define Npixels 3
+Adafruit_NeoPixel pixels(Npixels, 13, NEO_GRB + NEO_KHZ800);
+OneWire oneWire(4); 
+DallasTemperature sensors(&oneWire);
 
 void svjetlinaUpdate(double value){
     int brightness = (int) ((pow(1.12,value) - 1)*15.8);
@@ -76,14 +80,17 @@ void selectRGB3(int r, int g, int b)
     pixels.show();
 }
 
-void selectRGB4(int r, int g, int b)
-{
-    pixels.setPixelColor(3, pixels.Color(r,g,b));
-    pixels.show();
-}
-
 void changeState(){
     Serial.println("Changed state");
+}
+
+void led_changed(bool value)
+{
+    digitalWrite(23, value);
+}
+
+void emptyFunction(double data){
+
 }
 
 
@@ -114,25 +121,72 @@ private:
     RGBField *rgbField3 =
         new RGBField(5, "LED 3", 0, 0, 0, selectRGB3);
 
-    RGBField *rgbField4 =
-        new RGBField(6, "LED 4", 0, 0, 0, selectRGB4);
-        
-    ComplexGroupState *inidividualRgbState = new ComplexGroupState(3, "Individualni RGB", 4, rgbField1, rgbField2, rgbField3, rgbField4);
+    ComplexGroupState *inidividualRgbState = new ComplexGroupState(3, "Individualni RGB", 3, rgbField1, rgbField2, rgbField3);
 
     ComplexGroup *complexGroup = new ComplexGroup(0, "NOVA GRUPA", changeState, 4, brightnessState, colorSelectState, rgbState, inidividualRgbState);
 
+
+    ButtonField *blueLed =
+        new ButtonField(1, "Blue LED", INPUT_FIELD, false, led_changed);
+
+    FieldGroup *fieldGroup1 =
+        new FieldGroup(1, "LED", 1, blueLed);
+
+    NumericField *potField = 
+        new NumericField(0, "Potentiometer", OUTPUT_FIELD, 0.0, 4095.0, 1.0, "x =", "", emptyFunction);
+
+    NumericField *tempField = 
+        new NumericField(1, "Temperature",  OUTPUT_FIELD, -50.0, 200.0, 0.25, "T=", "°C", emptyFunction);
+
+    FieldGroup *fieldGroup2 =
+        new FieldGroup(2, "Inputs", 2, potField, tempField);
 public:
     void setupFields()
     {
-        createGroups(0);
+        createGroups(2, fieldGroup1, fieldGroup2);
        
         pixels.begin();
+        pinMode(23, OUTPUT);
+        sensors.begin();
         
         createComplexGroups(1, complexGroup);
     }
 
+ void potentiometerLoop(){
+        int potValue = analogRead(34); //12bit
+        // Serial.println("potValue:");
+        // Serial.println(potValue);
+        double currentValue = potField->getValue();
+
+        // Serial.println("oldValue:");
+        // Serial.println(currentValue);
+        if(currentValue - potValue > 50 || currentValue - potValue < -50){
+            // potField->setValue(String(potValue));
+            setNumericField(fieldGroup2->getGroupId(), potField->getId(), potValue);
+        }
+    }
+
+    void temperatureLoop(){
+        sensors.begin();
+        sensors.requestTemperatures(); // Send the command to get temperatures
+        float tempC = sensors.getTempCByIndex(0);
+        // Serial.println(tempC);
+
+        float currentValue = tempField->getValue();
+        // Serial.println(currentValue);
+
+        tempC = int(tempC / tempField->getStep()) * tempField->getStep();
+
+        float diff = currentValue - tempC;
+        if(diff >= 0.5 || diff <= -0.5){
+            // tempField->setValue(String(stringPayload) + " °C");
+            setNumericField(fieldGroup2->getGroupId(), tempField->getId(), tempC);
+        }
+    }
+
     void loop(){
- 
+        potentiometerLoop();
+        temperatureLoop();
     }
 
     virtual double getNumericFieldValue(int groupId, int fieldId) = 0;
