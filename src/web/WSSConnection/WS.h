@@ -30,9 +30,9 @@ static String newMessageHolder = "";
 class WS
 {
 private:
-    String basicLink = "wss://devcontrol-backend.onrender.com/";
+    // String basicLink = "wss://devcontrol-backend.onrender.com/";
     // String basicLink = "wss://devcontrol.herokuapp.com/";
-    // String basicLink = "ws://192.168.1.70:8000";
+    String basicLink = "ws://192.168.1.205:8000";
     
     WSSConnection *connection;
     int messagesLastChecked = 0;
@@ -85,8 +85,8 @@ public:
         if (connected)
         {
             sendfirstWSSMessage(*connection->nextConnection);
-            disconnectWS(*connection);
             wSSConnection *connectionTemp = connection;
+            disconnectWS(*connection);
             connection = connection->nextConnection;
             free (connectionTemp);
         }

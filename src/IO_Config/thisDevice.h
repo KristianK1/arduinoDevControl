@@ -160,7 +160,7 @@ public:
 
         // Serial.println("oldValue:");
         // Serial.println(currentValue);
-        if(currentValue - potValue > 20 || currentValue - potValue < -20){
+        if(currentValue - potValue > 50 || currentValue - potValue < -50){
             // potField->setValue(String(potValue));
             setNumericField(fieldGroup2->getGroupId(), potField->getId(), potValue);
         }
@@ -178,7 +178,7 @@ public:
         tempC = int(tempC / tempField->getStep()) * tempField->getStep();
 
         float diff = currentValue - tempC;
-        if(diff > 0.5 || diff < -0.5){
+        if(diff >= 0.5 || diff <= -0.5){
             // tempField->setValue(String(stringPayload) + " °C");
             setNumericField(fieldGroup2->getGroupId(), tempField->getId(), tempC);
         }
