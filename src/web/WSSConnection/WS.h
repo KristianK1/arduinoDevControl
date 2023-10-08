@@ -37,25 +37,32 @@ private:
     WSSConnection *connection;
     int messagesLastChecked = 0;
     int messageCheckInterval = 500;
+
+    int notConnectedTimer;
 public:
 
     bool connectAndMaintainConnection()
     {
+        if(millis() - notConnectedTimer > 1000 * 60 * 5){
+            //ako nije spojen na WS duže od 10 minuta resetiraj cijeli uređaj
+            throw(-1);
+        }
         if (connection == NULL)
         {
+            notConnectedTimer = millis();
             startFirstConnection();
         }
         else if (!isConnected())
         {
+            notConnectedTimer = millis();
             startNextConnection();
         }
-        else
+
+        if (millis() - connection->timeConnected >  (4*60 + 30) * 1000) // set to 4.99 mins later
         {
-            if (millis() - connection->timeConnected >  (4*60 + 30) * 1000) // set to 4.99 mins later
-            {
-                startNextConnection();
-            }
+            startNextConnection();
         }
+
     }
 
     void startFirstConnection()
@@ -67,6 +74,7 @@ public:
         if (connected)
         {
             sendfirstWSSMessage(*connection);
+            notConnectedTimer = 0;
         }
         else
         {
