@@ -15,10 +15,8 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-#define Npixels 3
+#define Npixels 120
 Adafruit_NeoPixel pixels(Npixels, 13, NEO_GRB + NEO_KHZ800);
-OneWire oneWire(4); 
-DallasTemperature sensors(&oneWire);
 
 void svjetlinaUpdate(double value){
     int brightness = (int) ((pow(1.12,value) - 1)*15.8);
