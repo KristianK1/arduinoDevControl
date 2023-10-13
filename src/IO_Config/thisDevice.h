@@ -13,8 +13,8 @@
 #include "ArduinoJson.h"
 #include <Adafruit_NeoPixel.h>
 
-#define Npixels 4
-Adafruit_NeoPixel pixels(Npixels, 12, NEO_GRB + NEO_KHZ800);
+#define Npixels 120
+Adafruit_NeoPixel pixels(Npixels, 13, NEO_GRB + NEO_KHZ800);
 
 void svjetlinaUpdate(double value){
     int brightness = (int) ((pow(1.12,value) - 1)*15.8);
