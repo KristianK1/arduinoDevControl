@@ -60,7 +60,6 @@ private:
     }
 
     bool connectToWS(WSSConnection &conn) {
-
         esp_err_t x = esp_websocket_client_start(conn.handle);
         int startedConnect = millis();
         while (esp_websocket_client_is_connected(conn.handle) == false && millis() - startedConnect < 10000)
@@ -88,8 +87,10 @@ public:
             return true;
         }
         else if(connection2.getRemainingTime() > 30000){
-
+            return true;
         }
+
+
     }
 
     void sendfirstWSSMessage(WSSConnection conn)
