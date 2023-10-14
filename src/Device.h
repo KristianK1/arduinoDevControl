@@ -45,7 +45,7 @@ public:
             }
         }
         IO::loop();
-        delay(50);
+        delay(1000);
     }
 
     void registerDevice()

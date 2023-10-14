@@ -4,31 +4,13 @@
 #include "../../deviceKey.h"
 #include "esp_websocket_client.h"
 #include "ArduinoJson.h"
-
-#define WS_MAXTIME 300000
-#define WS_RECONNECT_TIME 30000
-typedef struct wSSConnection
-{
-    long timeConnected; // millis
-    esp_websocket_client_handle_t handle;
-
-    bool isConnected(){
-        return esp_websocket_client_is_connected(handle);
-    }
-
-    int getRemainingTime(){
-        if(isConnected()){
-            return WS_MAXTIME - millis() + timeConnected;
-        }
-        return -1;
-    }
-
-} WSSConnection;
+#include "WSSConnection.h"
 
 
 String newDataBuffer = "";  //""buffer""
-
 static String newMessageHolder = "";
+
+
 class WS
 {
 private:
@@ -42,11 +24,6 @@ private:
     int messagesLastChecked = 0;
     int messageCheckInterval = 500;
 
-    WS(){
-        connection1.handle = createWsHandle();
-        connection2.handle = createWsHandle();
-    }
-
     esp_websocket_client_handle_t createWsHandle(){
 
         esp_websocket_client_config_t ws_cfg = {
@@ -58,55 +35,46 @@ private:
         esp_websocket_register_events(handle, WEBSOCKET_EVENT_DATA, websocket_event_handler, (void *)(handle));
         return handle;    
     }
-
-    bool connectToWS(WSSConnection &conn) {
-        esp_err_t x = esp_websocket_client_start(conn.handle);
-        int startedConnect = millis();
-        while (esp_websocket_client_is_connected(conn.handle) == false && millis() - startedConnect < 10000)
-        {
-            delay(500);
-            Serial.println("connecting to WSS");
-        }
-        if (esp_websocket_client_is_connected(conn.handle) == false)
-        {
-            Serial.println("failed to connect");
-            return false;
-        }
-        Serial.println("not failed???");
-
-        conn.timeConnected = millis();
-        Serial.println("not failed???2");
-        sendfirstWSSMessage(conn);
-        return true;
-    }
 public:
+    
+    WS(){
+        connection1.handle = createWsHandle();
+        connection2.handle = createWsHandle();
+    }
 
     bool connectAndMaintainConnection()
     {
-        if(connection1.getRemainingTime() > 30000){
+        int timeLeft1 = connection1.getRemainingTime();
+        int timeLeft2 = connection2.getRemainingTime();
+
+        if(timeLeft1 > WS_RECONNECT_TIME){
+            String x = String("CONN_1 long time to reconnect\n") + String("time1: ") + String(timeLeft1) + String("\ntime2: ") + String(timeLeft2);
+            Serial.println(x);
             return true;
         }
-        else if(connection2.getRemainingTime() > 30000){
+        else if(timeLeft2 > WS_RECONNECT_TIME){
+            String x = String("CONN_2 long time to reconnect\n") + String("time1: ") + String(timeLeft1) + String("\ntime2: ") + String(timeLeft2);
+            Serial.println(x);
             return true;
         }
-
-
-    }
-
-    void sendfirstWSSMessage(WSSConnection conn)
-    {
-        DynamicJsonDocument doc(1024);
-        doc["messageType"] = "connectDevice";
-        doc["data"]["deviceKey"] = deviceKey;
-        String myString;
-        serializeJson(doc, myString);
-        Serial.println(myString);
-        sendMessage(conn, myString);
-    }
-
-    void sendMessage(WSSConnection conn, String data)
-    {
-        esp_websocket_client_send_text(conn.handle, data.c_str(), data.length(), 5000);
+        else{
+            Serial.println("No conn has long time to reconnect\n");
+            Serial.println("CONN1 time to recconect " + timeLeft1);
+            Serial.println("CONN2 time to recconect " + timeLeft2);
+            
+            if(timeLeft1 > timeLeft2){           
+                Serial.println("CONN2 reconnect");
+                connection2.disconnect();
+                delay(100);
+                connection2.connectToWS();
+            }
+            else{
+                Serial.println("CONN1 reconnect");
+                connection1.disconnect();
+                delay(100);
+                connection1.connectToWS();
+            }
+        }
     }
 
     static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
@@ -123,16 +91,13 @@ public:
                 break;
             case WEBSOCKET_EVENT_DATA:
                 Serial.println("WEBSOCKET_EVENT_DATA");
-                // Serial.println(data->op_code);
-                // Serial.println(data->payload_offset);
                 newData = (char *)(data->data_ptr);
-                // Serial.println("Received=%.*s", data->data_len, (char *)data->data_ptr);
                 newData = newData.substring(0, data ->payload_len);
-                // Serial.println(newData.c_str());
                 newDataBuffer = newData.c_str();
                 newData = "";
-                Serial.println("result");
-                // Serial.println(newDataBuffer.c_str());
+                Serial.print("result: |");
+                Serial.print(newDataBuffer.c_str());
+                Serial.println("|");
                 newMessageHolder = newDataBuffer.c_str();
                 break;
             case WEBSOCKET_EVENT_ERROR:
@@ -144,7 +109,6 @@ public:
                 break;
         }
     }
-
 };
 
 #endif
