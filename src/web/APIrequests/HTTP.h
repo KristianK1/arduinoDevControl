@@ -2,6 +2,7 @@
 #define HTTP_H
 
 #include <HTTPClient.h>
+#include "../serverLink/serverLink.h"
 
 typedef struct hTTPresult
 {
@@ -10,18 +11,16 @@ typedef struct hTTPresult
     int statusCode;
 } HTTPresult;
 
-class HTTP
+class HTTP: ServerLink
 {
 private:
     HTTPClient http;
-    String basicLink = "https://devcontrol-backend.onrender.com/";
-    // String basicLink = "http://192.168.1.205:8000/";
 
 public:
     HTTPresult get(String subLink)
     {
         HTTPresult result;
-        String fullLink = basicLink + subLink;
+        String fullLink = httpLink + subLink;
         http.begin(fullLink.c_str());
         int responseCode = http.GET();
         String payload;
@@ -42,7 +41,7 @@ public:
     HTTPresult post(String sublink, String body)
     {
         HTTPresult result;
-        String fullLink = basicLink + sublink;
+        String fullLink = httpLink + sublink;
         http.begin(fullLink.c_str());
         http.addHeader("Content-Type", "application/json");
         int responseCode = http.POST(body);

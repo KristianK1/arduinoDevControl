@@ -16,10 +16,10 @@ public:
     {
     }
 
-    // virtual ~Device()
-    // {
-    //     // trebat ce nekad
-    // }
+    virtual ~Device()
+    {
+
+    }
 
 
     void setup(){

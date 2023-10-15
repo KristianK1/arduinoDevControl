@@ -5,21 +5,16 @@
 #include "esp_websocket_client.h"
 #include "ArduinoJson.h"
 #include "WSSConnection.h"
-
+#include "../serverLink/serverLink.h"
 
 String newDataBuffer = "";  //""buffer""
 static String newMessageHolder = "";
 
-
-class WS
+class WS: ServerLink
 {
 private:
-    String basicLink = "wss://devcontrol-backend.onrender.com/";
-    // String basicLink = "wss://devcontrol.herokuapp.com/";
-    // String basicLink = "ws://192.168.1.205:8000";
     
-    WSSConnection connection1;
-    WSSConnection connection2;
+    WSSConnection connection;
     
     int messagesLastChecked = 0;
     int messageCheckInterval = 500;
@@ -27,7 +22,7 @@ private:
     esp_websocket_client_handle_t createWsHandle(){
 
         esp_websocket_client_config_t ws_cfg = {
-            .uri = basicLink.c_str(),
+            .uri = wsLink.c_str(),
         };
         ws_cfg.buffer_size = 10000;
     
@@ -38,43 +33,13 @@ private:
 public:
     
     WS(){
-        connection1.handle = createWsHandle();
-        connection2.handle = createWsHandle();
+        connection.handle = createWsHandle();
     }
 
     bool connectAndMaintainConnection()
     {
-        int timeLeft1 = connection1.getRemainingTime();
-        int timeLeft2 = connection2.getRemainingTime();
-
-        if(timeLeft1 > WS_RECONNECT_TIME){
-            String x = String("CONN_1 long time to reconnect\n") + String("time1: ") + String(timeLeft1) + String("\ntime2: ") + String(timeLeft2);
-            Serial.println(x);
-            return true;
-        }
-        else if(timeLeft2 > WS_RECONNECT_TIME){
-            String x = String("CONN_2 long time to reconnect\n") + String("time1: ") + String(timeLeft1) + String("\ntime2: ") + String(timeLeft2);
-            Serial.println(x);
-            return true;
-        }
-        else{
-            Serial.println("No conn has long time to reconnect\n");
-            Serial.println("CONN1 time to recconect " + timeLeft1);
-            Serial.println("CONN2 time to recconect " + timeLeft2);
-            
-            if(timeLeft1 > timeLeft2){           
-                Serial.println("CONN2 reconnect");
-                connection2.disconnect();
-                delay(100);
-                connection2.connectToWS();
-            }
-            else{
-                Serial.println("CONN1 reconnect");
-                connection1.disconnect();
-                delay(100);
-                connection1.connectToWS();
-            }
-        }
+        if(connection.isConnected()) return true;
+        return connection.connectToWS();
     }
 
     static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)

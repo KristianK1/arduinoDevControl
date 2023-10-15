@@ -5,9 +5,6 @@
 #include "esp_websocket_client.h"
 #include "ArduinoJson.h"
 
-#define WS_MAXTIME 300000
-#define WS_RECONNECT_TIME 120000
-
 class WSSConnection
 {
     private:
@@ -34,17 +31,10 @@ class WSSConnection
         return esp_websocket_client_is_connected(handle);
     }
 
-    int getRemainingTime(){
-        if(isConnected()){
-            return WS_MAXTIME - millis() + timeConnected;
-        }
-        return -1;
-    }
-
     bool connectToWS() {
         esp_err_t x = esp_websocket_client_start(handle);
         int startedConnect = millis();
-        while (esp_websocket_client_is_connected(handle) == false && millis() - startedConnect < 10000)
+        while (esp_websocket_client_is_connected(handle) == false && millis() - startedConnect < 20000)
         {
             delay(500);
             Serial.println("connecting to WSS");
