@@ -16,6 +16,13 @@
 #include <DallasTemperature.h>
 
 
+void changeSmartStripState(){
+
+}
+
+void totalBrightness(double value){
+
+}
 
 void controlRed(double value){
     Serial.println("setting red to " +  String(value));
@@ -32,6 +39,35 @@ void controlBlue(double value){
 //   ledcWrite(3, (int)value);
 }
 
+void controlWhite(double value){
+    Serial.println("setting white to " +  String(value));
+//   ledcWrite(3, (int)value);
+}
+
+void setColorCode(int r, int g, int b){
+
+}
+
+void gauss_average(double data){
+
+}
+
+void gauss_sigma(double data){
+
+}
+
+void gauss_max(double data){
+
+}
+
+void gauss_color(int data){
+
+}
+
+void emptyFunction(double data){
+
+}
+
 
 
 
@@ -40,32 +76,62 @@ class ThisDevice : protected FieldGroups, protected ComplexGroups
 {
 private:
 
-    NumericField *redField = 
-        new NumericField(0, "Red", INPUT_FIELD, 0.0, 100.0, 1.0, "", "pst",  controlRed);
+    NumericField *brightnessField = 
+        new NumericField(0, "Svjetlina", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  totalBrightness);
+
+    ComplexGroupState *brightnessState = 
+        new ComplexGroupState(0, "Svjetlina", 1, brightnessField);
 
 
-    NumericField *greenField = 
-        new NumericField(1, "Green", INPUT_FIELD, 0.0, 100.0, 1.0, "", "pst",  controlGreen);
 
+    NumericField *redBrightnessField = 
+        new NumericField(0, "Crvena", INPUT_FIELD, 0.0, 100.0, 1.0, "", "",  controlRed);
 
-    NumericField *blueField = 
-        new NumericField(2, "Blue", INPUT_FIELD, 0.0, 100.0, 1.0, "", "pst",  controlBlue);
+    NumericField *greenBrightnessField = 
+        new NumericField(1, "Zelena", INPUT_FIELD, 0.0, 100.0, 1.0, "", "",  controlGreen);
 
+    NumericField *blueBrightnessField = 
+        new NumericField(2, "Plava", INPUT_FIELD, 0.0, 100.0, 1.0, "", "",  controlBlue);
 
-    FieldGroup *fg1 = 
-    new FieldGroup(0, "RGB", 3, redField, greenField, blueField);
+    ComplexGroupState *RGBBrightnessState = 
+        new ComplexGroupState(1, "Svjetlina - RGB", 3, redBrightnessField, greenBrightnessField, blueBrightnessField);
 
+    
+    RGBField *rgbField = 
+        new RGBField(0, "Color code", 0.0, 0.0, 0.0, setColorCode);
+
+    ComplexGroupState *colorCodeState = 
+        new ComplexGroupState(2, "Color code", 1, rgbField);
+
+    
+    NumericField *gaussAverageField = 
+        new NumericField(0, "Srednja vrijednost", INPUT_FIELD, 0.0, 180.0, 1.0, "", "", gauss_average);
+
+    NumericField *gaussSigmaField = 
+        new NumericField(1, "Odstupanje", INPUT_FIELD, 0.0, 50.0, 1.0, "","", gauss_sigma);
+
+    NumericField *gaussMaxValueField = 
+        new NumericField(2, "Maksimalna vrijednost", INPUT_FIELD, 0.0, 25.0, 1.0, "","", gauss_max);
+
+    MultipleChoiceField *gaussColorField = 
+        new MultipleChoiceField(3, "Boja", INPUT_FIELD, gauss_color, 4, "Crvena", "Zelena", "Plava", "Bijela");
+
+    ComplexGroupState *gauss = 
+        new ComplexGroupState(3, "Gausova funkcija", 4, gaussAverageField, gaussSigmaField, gaussMaxValueField, gaussColorField);
+
+    ComplexGroup *smartRGBstrip = 
+        new ComplexGroup(0, "LED traka - strop", changeSmartStripState, 4, brightnessState, RGBBrightnessState, colorCodeState, gauss);
 
 public:
     void setupFields()
     {
-        createGroups(1, fg1);
+        createGroups(0);
        
-        ledcAttachPin(25, 1);
-        ledcAttachPin(32, 2);
-        ledcAttachPin(33, 3);
+        // ledcAttachPin(25, 1);
+        // ledcAttachPin(32, 2);
+        // ledcAttachPin(33, 3);
    
-        createComplexGroups(0);
+        createComplexGroups(1, smartRGBstrip);
     }
 
     void loop(){
