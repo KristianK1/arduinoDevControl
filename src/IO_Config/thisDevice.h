@@ -15,36 +15,51 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+double nonLinearBrightnessFunctionBase = 1.243;
+double nonLinearBrightnessFunctionFactor = 4.4668;
+
+int getNonLinearBrightness(int state){
+    return int((pow(nonLinearBrightnessFunctionBase, state)-1) * nonLinearBrightnessFunctionFactor);
+}
+
+int Rpin = 32, Rchannel = 0;
+int Gpin = 33, Gchannel = 1;
+int Bpin = 25, Bchannel = 2;
+int Wpin = 27, Wchannel = 3;
 
 void changeSmartStripState(){
 
 }
 
-void totalBrightness(double value){
-
+void smartStrip_totalBrightness(double value){
+    int pwmState = getNonLinearBrightness(value);
+    ledcWrite(Rchannel, pwmState);
+    ledcWrite(Gchannel, pwmState);
+    ledcWrite(Bchannel, pwmState);
+    ledcWrite(Wchannel, pwmState);
 }
 
-void controlRed(double value){
+void smartStrip_controlRed(double value){
     Serial.println("setting red to " +  String(value));
 //   ledcWrite(1, (int)value);
 }
 
-void controlGreen(double value){
+void smartStrip_controlGreen(double value){
     Serial.println("setting green to " +  String(value));
 //   ledcWrite(2, (int)value);
 }
 
-void controlBlue(double value){
+void smartStrip_controlBlue(double value){
     Serial.println("setting blue to " +  String(value));
 //   ledcWrite(3, (int)value);
 }
 
-void controlWhite(double value){
+void smartStrip_controlWhite(double value){
     Serial.println("setting white to " +  String(value));
 //   ledcWrite(3, (int)value);
 }
 
-void setColorCode(int r, int g, int b){
+void smartStrip_setColorCode(int r, int g, int b){
 
 }
 
@@ -64,44 +79,88 @@ void gauss_color(int data){
 
 }
 
-void emptyFunction(double data){
+// ---------------------------------------------------
+
+void changeRGBStripState(){
 
 }
 
+void totalBrightness(double value){
+    int pwmState = getNonLinearBrightness(value);
+    ledcWrite(Rchannel, pwmState);
+    ledcWrite(Gchannel, pwmState);
+    ledcWrite(Bchannel, pwmState);
+    ledcWrite(Wchannel, pwmState);
+}
+
+void controlRed(double value){
+    int pwmState = getNonLinearBrightness(value);
+    ledcWrite(Rchannel, pwmState);
+}
+
+void controlGreen(double value){
+       int pwmState = getNonLinearBrightness(value);
+    ledcWrite(Gchannel, pwmState);
+}
+
+void controlBlue(double value){
+    int pwmState = getNonLinearBrightness(value);
+    ledcWrite(Bchannel, pwmState);
+}
+
+void controlWhite(double value){
+    int pwmState = getNonLinearBrightness(value);
+    ledcWrite(Wchannel, pwmState);
+}
+
+void setColorCode(int r, int g, int b){
+    ledcWrite(Rchannel, r);
+    ledcWrite(Gchannel, g);
+    ledcWrite(Bchannel, b);
+
+    int minimum = r;
+    if(minimum > g) minimum = g;
+    if(minimum > b) minimum = b;
+
+    ledcWrite(Wchannel, minimum);
+}
 
 
+void emptyFunction(double data){
+
+}
 
 
 class ThisDevice : protected FieldGroups, protected ComplexGroups
 {
 private:
 
-    NumericField *brightnessField = 
+    NumericField *smartStripBrightnessField = 
         new NumericField(0, "Svjetlina", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  totalBrightness);
 
-    ComplexGroupState *brightnessState = 
-        new ComplexGroupState(0, "Svjetlina", 1, brightnessField);
+    ComplexGroupState *smartStripBrightnessState = 
+        new ComplexGroupState(0, "Svjetlina", 1, smartStripBrightnessField);
 
 
 
-    NumericField *redBrightnessField = 
-        new NumericField(0, "Crvena", INPUT_FIELD, 0.0, 100.0, 1.0, "", "",  controlRed);
+    NumericField *smartStripRedBrightnessField = 
+        new NumericField(0, "Crvena", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  controlRed);
 
-    NumericField *greenBrightnessField = 
-        new NumericField(1, "Zelena", INPUT_FIELD, 0.0, 100.0, 1.0, "", "",  controlGreen);
+    NumericField *smartStripGreenBrightnessField = 
+        new NumericField(1, "Zelena", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  controlGreen);
 
-    NumericField *blueBrightnessField = 
-        new NumericField(2, "Plava", INPUT_FIELD, 0.0, 100.0, 1.0, "", "",  controlBlue);
+    NumericField *smartStripBlueBrightnessField = 
+        new NumericField(2, "Plava", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  controlBlue);
 
-    ComplexGroupState *RGBBrightnessState = 
-        new ComplexGroupState(1, "Svjetlina - RGB", 3, redBrightnessField, greenBrightnessField, blueBrightnessField);
+    ComplexGroupState *smartStripRGBBrightnessState = 
+        new ComplexGroupState(1, "Svjetlina - RGB", 3, smartStripRedBrightnessField, smartStripGreenBrightnessField, smartStripBlueBrightnessField);
 
     
-    RGBField *rgbField = 
+    RGBField *smartStripRGBField = 
         new RGBField(0, "Color code", 0.0, 0.0, 0.0, setColorCode);
 
-    ComplexGroupState *colorCodeState = 
-        new ComplexGroupState(2, "Color code", 1, rgbField);
+    ComplexGroupState *smartStripColorCodeState = 
+        new ComplexGroupState(2, "Color code", 1, smartStripRGBField);
 
     
     NumericField *gaussAverageField = 
@@ -116,22 +175,68 @@ private:
     MultipleChoiceField *gaussColorField = 
         new MultipleChoiceField(3, "Boja", INPUT_FIELD, gauss_color, 4, "Crvena", "Zelena", "Plava", "Bijela");
 
-    ComplexGroupState *gauss = 
+    ComplexGroupState *gaussState = 
         new ComplexGroupState(3, "Gausova funkcija", 4, gaussAverageField, gaussSigmaField, gaussMaxValueField, gaussColorField);
 
     ComplexGroup *smartRGBstrip = 
-        new ComplexGroup(0, "LED traka - strop", changeSmartStripState, 4, brightnessState, RGBBrightnessState, colorCodeState, gauss);
+        new ComplexGroup(0, "LED traka - strop", changeSmartStripState, 4, smartStripBrightnessState, smartStripRGBBrightnessState, smartStripColorCodeState, gaussState);
+
+    // ------------------------------------------------------------------------------------------
+
+    NumericField *RGBStripBrightnessField = 
+        new NumericField(0, "Svjetlina", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  totalBrightness);
+
+    ComplexGroupState *RGBStripBrightnessState = 
+        new ComplexGroupState(0, "Svjetlina", 1, RGBStripBrightnessField);
+
+
+
+    NumericField *RGBStripRedBrightnessField = 
+        new NumericField(0, "Crvena", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  controlRed);
+
+    NumericField *RGBStripGreenBrightnessField = 
+        new NumericField(1, "Zelena", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  controlGreen);
+
+    NumericField *RGBStripBlueBrightnessField = 
+        new NumericField(2, "Plava", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  controlBlue);
+
+    NumericField *RGBStripWhiteBrightnessField = 
+        new NumericField(3, "Bijela", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  controlWhite);
+
+    ComplexGroupState *RGBStripRGBBrightnessState = 
+        new ComplexGroupState(1, "Svjetlina - RGB", 3, RGBStripRedBrightnessField, RGBStripGreenBrightnessField, RGBStripBlueBrightnessField);
+
+    
+    RGBField *RGBStripRGBField = 
+        new RGBField(0, "Color code", 0.0, 0.0, 0.0, setColorCode);
+
+    ComplexGroupState *RGBStripColorCodeState = 
+        new ComplexGroupState(2, "Color code", 1, smartStripRGBField);
+
+    ComplexGroup *RGBstrip = 
+        new ComplexGroup(1, "LED traka - iza kauča", changeRGBStripState, 3, RGBStripBrightnessState, RGBStripRGBBrightnessState, RGBStripColorCodeState);
 
 public:
     void setupFields()
     {
         createGroups(0);
        
-        // ledcAttachPin(25, 1);
-        // ledcAttachPin(32, 2);
-        // ledcAttachPin(33, 3);
+        ledcSetup(Rchannel, 5000, 10);
+        ledcAttachPin(Rpin, Rchannel);
+        
+        ledcSetup(Gchannel, 5000, 10);
+        ledcAttachPin(Gpin, Gchannel);
+        
+        ledcSetup(Bchannel, 5000, 10);
+        ledcAttachPin(Bpin, Bchannel);
    
-        createComplexGroups(1, smartRGBstrip);
+        ledcSetup(Wchannel, 5000, 10);
+        ledcAttachPin(Wpin, Wchannel);
+
+        createComplexGroups(2, smartRGBstrip, RGBstrip);
+
+        pinMode(26, OUTPUT);
+        digitalWrite(26, HIGH);
     }
 
     void loop(){
