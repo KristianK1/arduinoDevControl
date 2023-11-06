@@ -20,9 +20,15 @@ OneWire oneWire2(33);
 DallasTemperature sensors1(&oneWire1);
 DallasTemperature sensors2(&oneWire2);
 
+void emptyFunctionNumericField(double data){
 
+}
 
-void emptyFunction(double data){
+void emptyFunctionButtonField(boolean data){
+
+}
+
+void wantedTemperatureChanged(double wantedTemperature){
 
 }
 
@@ -31,14 +37,21 @@ class ThisDevice : protected FieldGroups, protected ComplexGroups
 {
 private:
 
-    NumericField *tempField1 = 
-        new NumericField(0, "Temperature", OUTPUT_FIELD, 0.0, 150.0, 10.0, "", "°C", emptyFunction);
+    NumericField *roomTemperatureField1 = 
+        new NumericField(0, "Room temperature",  OUTPUT_FIELD, 0.0, 150.0, 0.5, "", "°C", emptyFunctionNumericField);
 
-    NumericField *tempField2 = 
-        new NumericField(1, "Temperature",  OUTPUT_FIELD, 0.0, 150.0, 0.5, "", "°C", emptyFunction);
+    NumericField *radiatorTemperatureField = 
+        new NumericField(1, "Radiator temperature", OUTPUT_FIELD, 0.0, 150.0, 10.0, "", "°C", emptyFunctionNumericField);
+
+    NumericField *targetTemperature = 
+        new NumericField(2, "Target temperature", INPUT_FIELD, 10.0, 30.0, 0.5, "", "°C", wantedTemperatureChanged);
+
+    ButtonField *heatingStateField = 
+        new ButtonField(3, "Heating state", OUTPUT_FIELD, false, emptyFunctionButtonField);
 
     FieldGroup *fieldGroup =
-        new FieldGroup(2, "Inputs", 2, tempField1, tempField2);
+        new FieldGroup(0, "Heating system", 4, roomTemperatureField1, radiatorTemperatureField, targetTemperature, heatingStateField);
+
 public:
     void setupFields()
     {
@@ -56,18 +69,18 @@ public:
         float tempC = sensors1.getTempCByIndex(0);
         // Serial.println(tempC);
 
-        float currentValue = tempField1->getValue();
+        float currentValue = roomTemperatureField1->getValue();
         // Serial.println(currentValue);
 
-        double newTemp_normalized = int(tempC / tempField1->getStep()) * tempField1->getStep();
+        double newTemp_normalized = int(tempC / roomTemperatureField1->getStep()) * roomTemperatureField1->getStep();
 
         float diff = currentValue - tempC;
         if(diff < 0){
             diff *= -1;
         }
 
-        if(diff >= tempField1->getStep() * 0.75){
-            setNumericField(fieldGroup->getGroupId(), tempField1->getId(), newTemp_normalized);
+        if(diff >= roomTemperatureField1->getStep() * 0.75){
+            setNumericField(fieldGroup->getGroupId(), roomTemperatureField1->getId(), newTemp_normalized);
         }
     }
 
@@ -77,18 +90,18 @@ public:
         float tempC = sensors2.getTempCByIndex(0);
         // Serial.println(tempC);
 
-        float currentValue = tempField2->getValue();
+        float currentValue = radiatorTemperatureField->getValue();
         // Serial.println(currentValue);
 
-        double newTemp_normalized = int(tempC / tempField2->getStep()) * tempField2->getStep();
+        double newTemp_normalized = int(tempC / radiatorTemperatureField->getStep()) * radiatorTemperatureField->getStep();
 
         float diff = currentValue - tempC;
         if(diff < 0){
             diff *= -1;
         }
 
-        if(diff >= tempField2->getStep() * 0.75){
-            setNumericField(fieldGroup->getGroupId(), tempField2->getId(), newTemp_normalized);
+        if(diff >= radiatorTemperatureField->getStep() * 0.75){
+            setNumericField(fieldGroup->getGroupId(), radiatorTemperatureField->getId(), newTemp_normalized);
         }
     }
 
