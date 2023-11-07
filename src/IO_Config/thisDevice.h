@@ -81,6 +81,14 @@ void changeRGBStripState(){
 
 void totalBrightness(double value){
     int pwmState = getNonLinearBrightness(value);
+    Serial.print("state: ");
+    Serial.println(pwmState);
+    Serial.print("state: ");
+    Serial.println(pwmState);
+    Serial.print("state: ");
+    Serial.println(pwmState);
+    Serial.print("state: ");
+    Serial.println(pwmState);
     ledcWrite(Rchannel, pwmState);
     ledcWrite(Gchannel, pwmState);
     ledcWrite(Bchannel, pwmState);
@@ -209,16 +217,16 @@ public:
     {
         createGroups(0);
        
-        ledcSetup(Rchannel, 2000, 8);
+        ledcSetup(Rchannel, 500, 8);
         ledcAttachPin(Rpin, Rchannel);
         
-        ledcSetup(Gchannel, 2000, 8);
+        ledcSetup(Gchannel, 500, 8);
         ledcAttachPin(Gpin, Gchannel);
         
-        ledcSetup(Bchannel, 2000, 8);
+        ledcSetup(Bchannel, 500, 8);
         ledcAttachPin(Bpin, Bchannel);
    
-        ledcSetup(Wchannel, 2000, 8);
+        ledcSetup(Wchannel, 500, 8);
         ledcAttachPin(Wpin, Wchannel);
 
         createComplexGroups(2, smartRGBstrip, RGBstrip);
