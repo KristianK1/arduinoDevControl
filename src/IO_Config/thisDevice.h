@@ -19,7 +19,7 @@
 const double nonLinearBrightnessFunctionBase = 1.16;
 
 int getNonLinearBrightness(int state){
-    return int(255/(pow(nonLinearBrightnessFunctionBase, 25) - 1)) * (pow(nonLinearBrightnessFunctionBase, state) - 1);
+    return int(255/(pow(nonLinearBrightnessFunctionBase, 25) - 1) * (pow(nonLinearBrightnessFunctionBase, state) - 1));
 }
 
 int Rpin = 33, Rchannel = 0;
