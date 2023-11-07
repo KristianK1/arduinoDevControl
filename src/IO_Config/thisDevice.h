@@ -15,11 +15,11 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-double nonLinearBrightnessFunctionBase = 1.243;
-double nonLinearBrightnessFunctionFactor = 4.4668;
+
+const double nonLinearBrightnessFunctionBase = 1.16;
 
 int getNonLinearBrightness(int state){
-    return int((pow(nonLinearBrightnessFunctionBase, state)-1) * nonLinearBrightnessFunctionFactor);
+    return int(255/(pow(nonLinearBrightnessFunctionBase, 25) - 1)) * (pow(nonLinearBrightnessFunctionBase, state) - 1);
 }
 
 int Rpin = 32, Rchannel = 0;
@@ -27,36 +27,30 @@ int Gpin = 33, Gchannel = 1;
 int Bpin = 25, Bchannel = 2;
 int Wpin = 27, Wchannel = 3;
 
-void changeSmartStripState(){
+boolean newGaussianValueForSmartStrip = true;
 
+void changeSmartStripState(){
+    
 }
 
 void smartStrip_totalBrightness(double value){
-    int pwmState = getNonLinearBrightness(value);
-    ledcWrite(Rchannel, pwmState);
-    ledcWrite(Gchannel, pwmState);
-    ledcWrite(Bchannel, pwmState);
-    ledcWrite(Wchannel, pwmState);
+
 }
 
 void smartStrip_controlRed(double value){
-    Serial.println("setting red to " +  String(value));
-//   ledcWrite(1, (int)value);
+
 }
 
 void smartStrip_controlGreen(double value){
-    Serial.println("setting green to " +  String(value));
-//   ledcWrite(2, (int)value);
+
 }
 
 void smartStrip_controlBlue(double value){
-    Serial.println("setting blue to " +  String(value));
-//   ledcWrite(3, (int)value);
+
 }
 
 void smartStrip_controlWhite(double value){
-    Serial.println("setting white to " +  String(value));
-//   ledcWrite(3, (int)value);
+
 }
 
 void smartStrip_setColorCode(int r, int g, int b){
@@ -64,19 +58,19 @@ void smartStrip_setColorCode(int r, int g, int b){
 }
 
 void gauss_average(double data){
-
+    newGaussianValueForSmartStrip = true;
 }
 
 void gauss_sigma(double data){
-
+    newGaussianValueForSmartStrip = true;
 }
 
 void gauss_max(double data){
-
+    newGaussianValueForSmartStrip = true;
 }
 
 void gauss_color(int data){
-
+    newGaussianValueForSmartStrip = true;
 }
 
 // ---------------------------------------------------
@@ -124,12 +118,6 @@ void setColorCode(int r, int g, int b){
 
     ledcWrite(Wchannel, minimum);
 }
-
-
-void emptyFunction(double data){
-
-}
-
 
 class ThisDevice : protected FieldGroups, protected ComplexGroups
 {
@@ -204,7 +192,7 @@ private:
         new NumericField(3, "Bijela", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  controlWhite);
 
     ComplexGroupState *RGBStripRGBBrightnessState = 
-        new ComplexGroupState(1, "Svjetlina - RGB", 3, RGBStripRedBrightnessField, RGBStripGreenBrightnessField, RGBStripBlueBrightnessField);
+        new ComplexGroupState(1, "Svjetlina - RGB", 4, RGBStripRedBrightnessField, RGBStripGreenBrightnessField, RGBStripBlueBrightnessField, RGBStripWhiteBrightnessField);
 
     
     RGBField *RGBStripRGBField = 
@@ -221,16 +209,16 @@ public:
     {
         createGroups(0);
        
-        ledcSetup(Rchannel, 5000, 10);
+        ledcSetup(Rchannel, 5000, 8);
         ledcAttachPin(Rpin, Rchannel);
         
-        ledcSetup(Gchannel, 5000, 10);
+        ledcSetup(Gchannel, 5000, 8);
         ledcAttachPin(Gpin, Gchannel);
         
-        ledcSetup(Bchannel, 5000, 10);
+        ledcSetup(Bchannel, 5000, 8);
         ledcAttachPin(Bpin, Bchannel);
    
-        ledcSetup(Wchannel, 5000, 10);
+        ledcSetup(Wchannel, 5000, 8);
         ledcAttachPin(Wpin, Wchannel);
 
         createComplexGroups(2, smartRGBstrip, RGBstrip);
@@ -240,7 +228,11 @@ public:
     }
 
     void loop(){
+        if(newGaussianValueForSmartStrip){
 
+
+            newGaussianValueForSmartStrip = false; //obavezno
+        }
     }
 
     virtual double getNumericFieldValue(int groupId, int fieldId) = 0;
