@@ -22,15 +22,15 @@ int getNonLinearBrightness(int state){
     return int(255/(pow(nonLinearBrightnessFunctionBase, 25) - 1)) * (pow(nonLinearBrightnessFunctionBase, state) - 1);
 }
 
-int Rpin = 32, Rchannel = 0;
-int Gpin = 33, Gchannel = 1;
-int Bpin = 25, Bchannel = 2;
-int Wpin = 27, Wchannel = 3;
+int Rpin = 33, Rchannel = 0;
+int Gpin = 32, Gchannel = 0;
+int Bpin = 25, Bchannel = 0;
+int Wpin = 27, Wchannel = 0;
 
 boolean newGaussianValueForSmartStrip = true;
 
 void changeSmartStripState(){
-    
+
 }
 
 void smartStrip_totalBrightness(double value){
