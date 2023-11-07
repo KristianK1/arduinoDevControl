@@ -23,9 +23,9 @@ int getNonLinearBrightness(int state){
 }
 
 int Rpin = 33, Rchannel = 0;
-int Gpin = 32, Gchannel = 0;
-int Bpin = 25, Bchannel = 0;
-int Wpin = 27, Wchannel = 0;
+int Gpin = 32, Gchannel = 1;
+int Bpin = 25, Bchannel = 2;
+int Wpin = 27, Wchannel = 3;
 
 boolean newGaussianValueForSmartStrip = true;
 
