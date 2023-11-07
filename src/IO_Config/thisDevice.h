@@ -209,16 +209,16 @@ public:
     {
         createGroups(0);
        
-        ledcSetup(Rchannel, 5000, 8);
+        ledcSetup(Rchannel, 2000, 8);
         ledcAttachPin(Rpin, Rchannel);
         
-        ledcSetup(Gchannel, 5000, 8);
+        ledcSetup(Gchannel, 2000, 8);
         ledcAttachPin(Gpin, Gchannel);
         
-        ledcSetup(Bchannel, 5000, 8);
+        ledcSetup(Bchannel, 2000, 8);
         ledcAttachPin(Bpin, Bchannel);
    
-        ledcSetup(Wchannel, 5000, 8);
+        ledcSetup(Wchannel, 2000, 8);
         ledcAttachPin(Wpin, Wchannel);
 
         createComplexGroups(2, smartRGBstrip, RGBstrip);
