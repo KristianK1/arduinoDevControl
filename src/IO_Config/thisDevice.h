@@ -178,7 +178,7 @@ private:
         new NumericField(1, "Odstupanje", INPUT_FIELD, 0.0, 50.0, 1.0, "","", gauss_sigma);
 
     NumericField *gaussMaxValueField = 
-        new NumericField(2, "Maksimalna vrijednost", INPUT_FIELD, 0.0, 25.0, 1.0, "","", gauss_max);
+        new NumericField(2, "Maksimalna vrijednost", INPUT_FIELD, 0.0, 255.0, 1.0, "","", gauss_max);
 
     MultipleChoiceField *gaussColorField = 
         new MultipleChoiceField(3, "Boja", INPUT_FIELD, gauss_color, 4, "Crvena", "Zelena", "Plava", "Bijela");
@@ -286,29 +286,32 @@ public:
             switch(color){
                     case 0: //red
                         for(int i = 0; i< LED_COUNT; i++){
-                            int value = maksimum * pow(EULER, -1/2 * pow(i-average,2)/pow(sigma,2));
+                            int value = int(maksimum * pow(EULER, -1.0/2 * pow(i-average,2)/pow(sigma,2)));
                             strip.setPixelColor(i, strip.Color(value, 0, 0));
                         }
+                        strip.show();
                     break;
                     case 1: //green
                         for(int i = 0; i< LED_COUNT; i++){
-                            int value = maksimum * pow(EULER, -1/2 * pow(i-average,2)/pow(sigma,2));
+                            int value = int(maksimum * pow(EULER, -1.0/2 * pow(i-average,2)/pow(sigma,2)));
                             strip.setPixelColor(i, strip.Color(0, value, 0));
                         }
+                        strip.show();
                     break;
                     case 2: //blue
                         for(int i = 0; i< LED_COUNT; i++){
-                            int value = maksimum * pow(EULER, -1/2 * pow(i-average,2)/pow(sigma,2));
+                            int value = int(maksimum * pow(EULER, -1.0/2 * pow(i-average,2)/pow(sigma,2)));
                             strip.setPixelColor(i, strip.Color(0, 0, value));
                         }
+                        strip.show();
                     break;
                     case 3: //white
                         for(int i = 0; i< LED_COUNT; i++){
-                            int value = maksimum * pow(EULER, -1/2 * pow(i-average,2)/pow(sigma,2));
+                            int value = int(maksimum * pow(EULER, -1.0/2 * pow(i-average,2)/pow(sigma,2)));
                             strip.setPixelColor(i, strip.Color(value, value, value));
                         }
+                        strip.show();
                     break;  
-                    strip.show();
             }
 
             newGaussianValueForSmartStrip = false; //obavezno
