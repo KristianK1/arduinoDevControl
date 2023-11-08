@@ -15,10 +15,15 @@
 #include <DallasTemperature.h>
 
 OneWire oneWire1(32);
-OneWire oneWire2(33); 
+OneWire oneWire2(33);
+
+int heatingRelayPin = 5;
 
 DallasTemperature sensors1(&oneWire1);
 DallasTemperature sensors2(&oneWire2);
+
+bool newTargetTemperatureFlag = true;
+
 
 void emptyFunctionNumericField(double data){
 
@@ -29,7 +34,7 @@ void emptyFunctionButtonField(boolean data){
 }
 
 void wantedTemperatureChanged(double wantedTemperature){
-
+    
 }
 
 
@@ -41,7 +46,7 @@ private:
         new NumericField(0, "Room temperature",  OUTPUT_FIELD, 0.0, 150.0, 0.5, "", "°C", emptyFunctionNumericField);
 
     NumericField *radiatorTemperatureField = 
-        new NumericField(1, "Radiator temperature", OUTPUT_FIELD, 0.0, 150.0, 10.0, "", "°C", emptyFunctionNumericField);
+        new NumericField(1, "Radiator temperature", OUTPUT_FIELD, 0.0, 150.0, 5.0, "", "°C", emptyFunctionNumericField);
 
     NumericField *targetTemperature = 
         new NumericField(2, "Target temperature", INPUT_FIELD, 10.0, 30.0, 0.5, "", "°C", wantedTemperatureChanged);
@@ -51,6 +56,9 @@ private:
 
     FieldGroup *fieldGroup =
         new FieldGroup(0, "Heating system", 4, roomTemperatureField1, radiatorTemperatureField, targetTemperature, heatingStateField);
+
+    boolean heatingRelayState = false;
+    double heatingRelayStateTimer;
 
 public:
     void setupFields()
@@ -79,7 +87,7 @@ public:
             diff *= -1;
         }
 
-        if(diff >= roomTemperatureField1->getStep() * 0.75){
+        if(diff >= roomTemperatureField1->getStep() * 1){
             setNumericField(fieldGroup->getGroupId(), roomTemperatureField1->getId(), newTemp_normalized);
         }
     }
@@ -105,9 +113,36 @@ public:
         }
     }
 
+    
+    void wantedTemperatureLoop(){
+        int roomTemp = roomTemperatureField1->getValue();
+        int wantedTemperature = targetTemperature->getValue();
+
+        if(wantedTemperature >= roomTemp){
+            //need to turn OFF heating
+            changeHeatingRelayState(false);
+        }
+        else{
+            //need to turn ON heating
+            changeHeatingRelayState(true);
+        }
+    }
+
+    void changeHeatingRelayState(boolean state){
+        if(heatingRelayState == state) return;
+
+        if(heatingRelayStateTimer - millis() > 60 * 1000){
+            digitalWrite(heatingRelayPin, state);
+            heatingRelayState = state;
+            heatingRelayStateTimer = millis();
+        }
+        else return;
+    }
+
     void loop(){
         temperatureLoop1();
         temperatureLoop2();
+        wantedTemperatureLoop();
     }
 
     virtual double getNumericFieldValue(int groupId, int fieldId) = 0;
