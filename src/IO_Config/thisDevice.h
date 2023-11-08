@@ -165,7 +165,7 @@ private:
 
     
     RGBField *smartStripRGBField = 
-        new RGBField(0, "Color code", 0.0, 0.0, 0.0, setColorCode);
+        new RGBField(0, "Color code", 0.0, 0.0, 0.0, smartStrip_setColorCode);
 
     ComplexGroupState *smartStripColorCodeState = 
         new ComplexGroupState(2, "Color code", 1, smartStripRGBField);
@@ -302,6 +302,7 @@ public:
                             strip.setPixelColor(i, strip.Color(value, value, value));
                         }
                     break;  
+                    strip.show();
             }
 
             newGaussianValueForSmartStrip = false; //obavezno
