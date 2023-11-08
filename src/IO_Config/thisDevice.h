@@ -277,6 +277,12 @@ public:
             double sigma = gaussSigmaField->getValue();
             double maksimum = gaussMaxValueField->getValue();
             int color = gaussColorField->getValue();
+
+            Serial.println("gausian values: ");
+            Serial.println(average);
+            Serial.println(sigma);
+            Serial.println(maksimum);
+            
             switch(color){
                     case 0: //red
                         for(int i = 0; i< LED_COUNT; i++){
