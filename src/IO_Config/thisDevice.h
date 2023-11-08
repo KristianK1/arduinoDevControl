@@ -14,7 +14,9 @@
 #include <Adafruit_NeoPixel.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <math.h>
 
+#define eulerNumber 2.718281828459045
 
 const double nonLinearBrightnessFunctionBase = 1.16;
 
@@ -27,34 +29,52 @@ int Gpin = 32, Gchannel = 1;
 int Bpin = 25, Bchannel = 2;
 int Wpin = 27, Wchannel = 3;
 
+#define LED_PIN 5
+
+// How many NeoPixels are attached to the Arduino?
+#define LED_COUNT 180
+
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+boolean newIndividualValueForSmartStrip = true;
 boolean newGaussianValueForSmartStrip = true;
+
+
+
 
 void changeSmartStripState(){
 
 }
 
 void smartStrip_totalBrightness(double value){
-
+    int pwmState = getNonLinearBrightness(value);
+    for(int i = 0; i< LED_COUNT; i++){
+        strip.setPixelColor(i, strip.Color(pwmState, pwmState, pwmState));  
+    }
+    strip.show();
 }
 
 void smartStrip_controlRed(double value){
-
+    newIndividualValueForSmartStrip = true;
 }
 
 void smartStrip_controlGreen(double value){
-
+    newIndividualValueForSmartStrip = true;
 }
 
 void smartStrip_controlBlue(double value){
-
-}
-
-void smartStrip_controlWhite(double value){
-
+    newIndividualValueForSmartStrip = true;
 }
 
 void smartStrip_setColorCode(int r, int g, int b){
-
+    if(r == 256) r = 255;
+    if(g == 256) g = 255;
+    if(b == 256) b = 255;
+    
+    for(int i = 0; i< LED_COUNT; i++){
+        strip.setPixelColor(i, strip.Color(r, g, b));  
+    }
+    strip.show();
 }
 
 void gauss_average(double data){
@@ -81,14 +101,6 @@ void changeRGBStripState(){
 
 void totalBrightness(double value){
     int pwmState = getNonLinearBrightness(value);
-    Serial.print("state: ");
-    Serial.println(pwmState);
-    Serial.print("state: ");
-    Serial.println(pwmState);
-    Serial.print("state: ");
-    Serial.println(pwmState);
-    Serial.print("state: ");
-    Serial.println(pwmState);
     ledcWrite(Rchannel, pwmState);
     ledcWrite(Gchannel, pwmState);
     ledcWrite(Bchannel, pwmState);
@@ -132,7 +144,7 @@ class ThisDevice : protected FieldGroups, protected ComplexGroups
 private:
 
     NumericField *smartStripBrightnessField = 
-        new NumericField(0, "Svjetlina", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  totalBrightness);
+        new NumericField(0, "Svjetlina", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  smartStrip_totalBrightness);
 
     ComplexGroupState *smartStripBrightnessState = 
         new ComplexGroupState(0, "Svjetlina", 1, smartStripBrightnessField);
@@ -140,13 +152,13 @@ private:
 
 
     NumericField *smartStripRedBrightnessField = 
-        new NumericField(0, "Crvena", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  controlRed);
+        new NumericField(0, "Crvena", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  smartStrip_controlRed);
 
     NumericField *smartStripGreenBrightnessField = 
-        new NumericField(1, "Zelena", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  controlGreen);
+        new NumericField(1, "Zelena", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  smartStrip_controlGreen);
 
     NumericField *smartStripBlueBrightnessField = 
-        new NumericField(2, "Plava", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  controlBlue);
+        new NumericField(2, "Plava", INPUT_FIELD, 0.0, 25.0, 1.0, "", "",  smartStrip_controlBlue);
 
     ComplexGroupState *smartStripRGBBrightnessState = 
         new ComplexGroupState(1, "Svjetlina - RGB", 3, smartStripRedBrightnessField, smartStripGreenBrightnessField, smartStripBlueBrightnessField);
@@ -160,7 +172,7 @@ private:
 
     
     NumericField *gaussAverageField = 
-        new NumericField(0, "Srednja vrijednost", INPUT_FIELD, 0.0, 180.0, 1.0, "", "", gauss_average);
+        new NumericField(0, "Srednja vrijednost", INPUT_FIELD, 0.0, 179.0, 1.0, "", "", gauss_average);
 
     NumericField *gaussSigmaField = 
         new NumericField(1, "Odstupanje", INPUT_FIELD, 0.0, 50.0, 1.0, "","", gauss_sigma);
@@ -217,6 +229,9 @@ public:
     {
         createGroups(0);
        
+        strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
+        strip.show();     
+
         ledcSetup(Rchannel, 500, 8);
         ledcAttachPin(Rpin, Rchannel);
         
@@ -233,11 +248,61 @@ public:
 
         pinMode(26, OUTPUT);
         digitalWrite(26, HIGH);
+
+
     }
 
     void loop(){
-        if(newGaussianValueForSmartStrip){
+        if(newIndividualValueForSmartStrip){
+            int red = smartStripRedBrightnessField->getValue();
+            int green = smartStripGreenBrightnessField->getValue();
+            int blue = smartStripBlueBrightnessField->getValue();
+            
+            red = getNonLinearBrightness(red);
+            green = getNonLinearBrightness(green);
+            blue = getNonLinearBrightness(blue);
 
+            for(int i = 0; i< LED_COUNT; i++){
+                strip.setPixelColor(i, strip.Color(red, green, blue));  
+            }
+            strip.show();
+
+            newIndividualValueForSmartStrip = false;
+        }
+
+
+
+        if(newGaussianValueForSmartStrip){
+            double average = gaussAverageField->getValue();
+            double sigma = gaussSigmaField->getValue();
+            double maksimum = gaussMaxValueField->getValue();
+            int color = gaussColorField->getValue();
+            switch(color){
+                    case 0: //red
+                        for(int i = 0; i< LED_COUNT; i++){
+                            int value = maksimum * pow(EULER, -1/2 * pow(i-average,2)/pow(sigma,2));
+                            strip.setPixelColor(i, strip.Color(value, 0, 0));
+                        }
+                    break;
+                    case 1: //green
+                        for(int i = 0; i< LED_COUNT; i++){
+                            int value = maksimum * pow(EULER, -1/2 * pow(i-average,2)/pow(sigma,2));
+                            strip.setPixelColor(i, strip.Color(0, value, 0));
+                        }
+                    break;
+                    case 2: //blue
+                        for(int i = 0; i< LED_COUNT; i++){
+                            int value = maksimum * pow(EULER, -1/2 * pow(i-average,2)/pow(sigma,2));
+                            strip.setPixelColor(i, strip.Color(0, 0, value));
+                        }
+                    break;
+                    case 3: //white
+                        for(int i = 0; i< LED_COUNT; i++){
+                            int value = maksimum * pow(EULER, -1/2 * pow(i-average,2)/pow(sigma,2));
+                            strip.setPixelColor(i, strip.Color(value, value, value));
+                        }
+                    break;  
+            }
 
             newGaussianValueForSmartStrip = false; //obavezno
         }
