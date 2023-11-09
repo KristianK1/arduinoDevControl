@@ -14,10 +14,10 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-OneWire oneWire1(32);
-OneWire oneWire2(33);
+OneWire oneWire1(25);
+OneWire oneWire2(26);
 
-int heatingRelayPin = 5;
+int heatingRelayPin = 33;
 
 DallasTemperature sensors1(&oneWire1);
 DallasTemperature sensors2(&oneWire2);
@@ -58,13 +58,15 @@ private:
         new FieldGroup(0, "Heating system", 4, roomTemperatureField1, radiatorTemperatureField, targetTemperature, heatingStateField);
 
     boolean heatingRelayState = false;
-    double heatingRelayStateTimer;
+    double heatingRelayStateTimer = 0;
 
 public:
     void setupFields()
     {
         sensors1.begin();
         sensors2.begin();
+
+        pinMode(33, OUTPUT);
 
         createGroups(1, fieldGroup);        
         createComplexGroups(0);
@@ -120,23 +122,29 @@ public:
 
         if(wantedTemperature >= roomTemp){
             //need to turn OFF heating
-            changeHeatingRelayState(false);
+            changeHeatingRelayState(true);
         }
         else{
             //need to turn ON heating
-            changeHeatingRelayState(true);
+            changeHeatingRelayState(false);
         }
     }
 
     void changeHeatingRelayState(boolean state){
+        Serial.println("enter change heating state function");
         if(heatingRelayState == state) return;
 
-        if(heatingRelayStateTimer - millis() > 60 * 1000){
+        if(millis() - heatingRelayStateTimer > 60 * 1000){
+            Serial.println("timer OK");
             digitalWrite(heatingRelayPin, state);
+            setButtonField(fieldGroup->getGroupId(), heatingStateField->getId(), state);
             heatingRelayState = state;
             heatingRelayStateTimer = millis();
         }
-        else return;
+        else{
+            Serial.println("timer NOT OK");
+            
+        }
     }
 
     void loop(){
