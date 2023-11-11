@@ -11,7 +11,6 @@
 #include "availableFields/ComplexGroup.h"
 
 #include "ArduinoJson.h"
-#include <Adafruit_NeoPixel.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <math.h>
