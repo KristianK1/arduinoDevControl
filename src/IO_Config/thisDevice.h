@@ -110,22 +110,22 @@ public:
             diff *= -1;
         }
 
-        if(diff >= radiatorTemperatureField->getStep() * 0.75){
+        if(diff >= radiatorTemperatureField->getStep() * 1.2){
             setNumericField(fieldGroup->getGroupId(), radiatorTemperatureField->getId(), newTemp_normalized);
         }
     }
 
     
     void wantedTemperatureLoop(){
-        int roomTemp = roomTemperatureField1->getValue();
-        int wantedTemperature = targetTemperature->getValue();
+        double roomTemp = roomTemperatureField1->getValue();
+        double wantedTemperature = targetTemperature->getValue();
 
-        if(wantedTemperature >= roomTemp){
-            //need to turn OFF heating
+        if(wantedTemperature > roomTemp){
+            //need to turn ON heating
             changeHeatingRelayState(true);
         }
         else{
-            //need to turn ON heating
+            //need to turn OFF heating
             changeHeatingRelayState(false);
         }
     }
