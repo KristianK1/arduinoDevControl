@@ -136,7 +136,7 @@ private:
         new NumericField(0, "Potentiometer", OUTPUT_FIELD, 0.0, 4095.0, 1.0, "x =", "", emptyFunction);
 
     NumericField *tempField = 
-        new NumericField(1, "Temperature",  OUTPUT_FIELD, -50.0, 200.0, 0.25, "T=", "°C", emptyFunction);
+        new NumericField(1, "Temperature",  OUTPUT_FIELD, 0.0, 50.0, 0.5, "T=", "°C", emptyFunction);
 
     FieldGroup *fieldGroup2 =
         new FieldGroup(2, "Inputs", 2, potField, tempField);
@@ -166,7 +166,7 @@ public:
         }
     }
 
-    void temperatureLoop(){
+void temperatureLoop(){
         sensors.begin();
         sensors.requestTemperatures(); // Send the command to get temperatures
         float tempC = sensors.getTempCByIndex(0);
@@ -175,12 +175,15 @@ public:
         float currentValue = tempField->getValue();
         // Serial.println(currentValue);
 
-        tempC = int(tempC / tempField->getStep()) * tempField->getStep();
+        double newTemp_normalized = int(tempC / tempField->getStep()) * tempField->getStep();
 
         float diff = currentValue - tempC;
-        if(diff >= 0.5 || diff <= -0.5){
-            // tempField->setValue(String(stringPayload) + " °C");
-            setNumericField(fieldGroup2->getGroupId(), tempField->getId(), tempC);
+        if(diff < 0){
+            diff *= -1;
+        }
+
+        if(diff >= tempField->getStep() * 0.8){
+            setNumericField(fieldGroup2->getGroupId(), tempField->getId(), newTemp_normalized);
         }
     }
 
