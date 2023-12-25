@@ -248,7 +248,6 @@ public:
         pinMode(26, OUTPUT);
         digitalWrite(26, HIGH);
 
-
     }
 
     void loop(){
