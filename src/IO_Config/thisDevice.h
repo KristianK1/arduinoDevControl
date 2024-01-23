@@ -25,8 +25,8 @@ int getNonLinearBrightness(int state){
 }
 
 int Rpin = 33, Rchannel = 0;
-int Gpin = 32, Gchannel = 1;
-int Bpin = 25, Bchannel = 2;
+int Gpin = 25, Gchannel = 1;
+int Bpin = 32, Bchannel = 2;
 int Wpin = 27, Wchannel = 3;
 
 #define LED_PIN 5
@@ -219,7 +219,7 @@ private:
         new RGBField(0, "Color code", 0.0, 0.0, 0.0, setColorCode);
 
     ComplexGroupState *RGBStripColorCodeState = 
-        new ComplexGroupState(2, "Color code", 1, smartStripRGBField);
+        new ComplexGroupState(2, "Color code", 1, RGBStripRGBField);
 
     ComplexGroup *RGBstrip = 
         new ComplexGroup(1, "LED traka - iza kauča", changeRGBStripState, 3, RGBStripBrightnessState, RGBStripRGBBrightnessState, RGBStripColorCodeState);
