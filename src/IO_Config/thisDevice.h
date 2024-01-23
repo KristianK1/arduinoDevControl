@@ -16,8 +16,8 @@
 
 OneWire oneWire1(25);
 OneWire oneWire2(26);
-OneWire oneWire3(34);
-OneWire oneWire4(35);
+OneWire oneWire3(32);
+OneWire oneWire4(27);
 
 int heatingRelayPin = 33;
 
@@ -77,6 +77,9 @@ public:
         sensors3.begin();
         sensors4.begin();
         pinMode(33, OUTPUT);
+        pinMode(34, INPUT_PULLUP);
+        pinMode(35, INPUT_PULLUP);
+        
 
         createGroups(1, fieldGroup);        
         createComplexGroups(0);
@@ -146,7 +149,7 @@ public:
         }
     }
     
-        void temperatureLoop4(){
+    void temperatureLoop4(){
         sensors4.begin();
         sensors4.requestTemperatures(); // Send the command to get temperatures
         float tempC = sensors4.getTempCByIndex(0);
