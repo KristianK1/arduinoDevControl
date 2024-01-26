@@ -49,29 +49,45 @@ class ThisDevice : protected FieldGroups, protected ComplexGroups
 {
 private:
 
-    NumericField *temp1 = 
-        new NumericField(0, "Soba1",  OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
-
-    NumericField *temp2 = 
-        new NumericField(1, "Dnevna soba", OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
-
-    NumericField *temp3 = 
-        new NumericField(2, "Soba2",  OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
-
-    NumericField *temp4 = 
-        new NumericField(3, "Vanjska", OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
-       
     MultipleChoiceField *heatingType = 
-        new MultipleChoiceField(4, "Heating type", INPUT_FIELD, emptyFunctionMCField, 4, "Minimum", "Srednji", "Maksimum", "Srednja vrijednost");
+        new MultipleChoiceField(20, "Heating type", INPUT_FIELD, emptyFunctionMCField, 3, "Minimum", "Average", "Maximum");
 
     NumericField *targetTemperature = 
-        new NumericField(5, "Target temperature", INPUT_FIELD, 10.0, 30.0, 0.5, "", "°C", wantedTemperatureChanged);
+        new NumericField(21, "Target temperature", INPUT_FIELD, 10.0, 30.0, 0.5, "", "°C", wantedTemperatureChanged);
 
-    ButtonField *heatingStateField = 
-        new ButtonField(6, "Heating state", OUTPUT_FIELD, false, emptyFunctionButtonField);
+    ButtonField *heatKristiansRoom = 
+        new ButtonField(22, "Heat Kristian's room", INPUT_FIELD, false, emptyFunctionButtonField);
 
-    FieldGroup *fieldGroup =
-        new FieldGroup(0, "Heating system", 7, temp1, temp2, temp3, temp4, heatingType, targetTemperature, heatingStateField);
+    ButtonField *heatLivingRoom = 
+        new ButtonField(23, "Heat Living room", INPUT_FIELD, false, emptyFunctionButtonField);
+
+    ButtonField *heatGoransRoom = 
+        new ButtonField(24, "Heat Goran's room", INPUT_FIELD, false, emptyFunctionButtonField);
+
+    ButtonField *heatingState = 
+        new ButtonField(25, "Heater state", OUTPUT_FIELD, false, emptyFunctionButtonField);
+
+    FieldGroup *heatingOptions =
+        new FieldGroup(0, "Heating options", 6, heatingType, targetTemperature, heatKristiansRoom, heatLivingRoom, heatGoransRoom, heatingState);
+
+    // ----------------------------------------------
+
+    NumericField *KristiansRoomTemp = 
+        new NumericField(0, "Kristian's room",  OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
+
+    NumericField *LivingRoomTemp = 
+        new NumericField(1, "Living room", OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
+
+    NumericField *GoransRoomTemp = 
+        new NumericField(2, "Goran's room",  OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
+
+    NumericField *HallwayTemp = 
+        new NumericField(3, "Hallway", OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
+
+    FieldGroup *tempGroup =
+        new FieldGroup(1, "Temperatures", 4, KristiansRoomTemp, LivingRoomTemp, GoransRoomTemp, HallwayTemp);
+
+
 
     boolean heatingRelayState = false;
     double heatingRelayStateTimer = 0;
@@ -88,7 +104,7 @@ public:
         pinMode(35, INPUT_PULLUP);
         
 
-        createGroups(1, fieldGroup);        
+        createGroups(2, heatingOptions, tempGroup);        
         createComplexGroups(0);
     }
 
@@ -99,18 +115,18 @@ public:
         float tempC = sensors1.getTempCByIndex(0);
         // Serial.println(tempC);
 
-        float currentValue = temp1->getValue();
+        float currentValue = KristiansRoomTemp->getValue();
         // Serial.println(currentValue);
 
-        double newTemp_normalized = int(tempC / temp1->getStep()) * temp1->getStep();
+        double newTemp_normalized = int(tempC / KristiansRoomTemp->getStep()) * KristiansRoomTemp->getStep();
 
         float diff = currentValue - tempC;
         if(diff < 0){
             diff *= -1;
         }
 
-        if(diff >= temp1->getStep() * 1){
-            setNumericField(fieldGroup->getGroupId(), temp1->getId(), newTemp_normalized);
+        if(diff >= KristiansRoomTemp->getStep() * 1){
+            setNumericField(tempGroup->getGroupId(), KristiansRoomTemp->getId(), newTemp_normalized);
         }
     }
 
@@ -120,18 +136,18 @@ public:
         float tempC = sensors2.getTempCByIndex(0);
         // Serial.println(tempC);
 
-        float currentValue = temp2->getValue();
+        float currentValue = heatLivingRoom->getValue();
         // Serial.println(currentValue);
 
-        double newTemp_normalized = int(tempC / temp2->getStep()) * temp2->getStep();
+        double newTemp_normalized = int(tempC / LivingRoomTemp->getStep()) * LivingRoomTemp->getStep();
 
         float diff = currentValue - tempC;
         if(diff < 0){
             diff *= -1;
         }
 
-        if(diff >= temp2->getStep() * 1.2){
-            setNumericField(fieldGroup->getGroupId(), temp2->getId(), newTemp_normalized);
+        if(diff >= LivingRoomTemp->getStep() * 1){
+            setNumericField(tempGroup->getGroupId(), LivingRoomTemp->getId(), newTemp_normalized);
         }
     }
 
@@ -141,18 +157,18 @@ public:
         float tempC = sensors3.getTempCByIndex(0);
         // Serial.println(tempC);
 
-        float currentValue = temp3->getValue();
+        float currentValue = GoransRoomTemp->getValue();
         // Serial.println(currentValue);
 
-        double newTemp_normalized = int(tempC / temp3->getStep()) * temp3->getStep();
+        double newTemp_normalized = int(tempC / GoransRoomTemp->getStep()) * GoransRoomTemp->getStep();
 
         float diff = currentValue - tempC;
         if(diff < 0){
             diff *= -1;
         }
 
-        if(diff >= temp3->getStep() * 1.2){
-            setNumericField(fieldGroup->getGroupId(), temp3->getId(), newTemp_normalized);
+        if(diff >= GoransRoomTemp->getStep() * 1){
+            setNumericField(tempGroup->getGroupId(), GoransRoomTemp->getId(), newTemp_normalized);
         }
     }
     
@@ -162,65 +178,110 @@ public:
         float tempC = sensors4.getTempCByIndex(0);
         // Serial.println(tempC);
 
-        float currentValue = temp4->getValue();
+        float currentValue = HallwayTemp->getValue();
         // Serial.println(currentValue);
 
-        double newTemp_normalized = int(tempC / temp4->getStep()) * temp4->getStep();
+        double newTemp_normalized = int(tempC / HallwayTemp->getStep()) * HallwayTemp->getStep();
 
         float diff = currentValue - tempC;
         if(diff < 0){
             diff *= -1;
         }
 
-        if(diff >= temp4->getStep() * 1.2){
-            setNumericField(fieldGroup->getGroupId(), temp4->getId(), newTemp_normalized);
+        if(diff >= HallwayTemp->getStep() * 1){
+            setNumericField(tempGroup->getGroupId(), HallwayTemp->getId(), newTemp_normalized);
         }
     }
 
     void wantedTemperatureLoop(){
-        double temp1Value = temp1->getValue();
-        double temp2Value = temp2->getValue();
-        double temp3Value = temp3->getValue();
+        double Kvalue = KristiansRoomTemp->getValue();
+        double Lvalue = LivingRoomTemp->getValue();
+        double Gvalue = GoransRoomTemp->getValue();
         
         Serial.println("Temperature values: ");
-        Serial.println(temp1Value);
-        Serial.println(temp2Value);
-        Serial.println(temp3Value);
-        
-        double wantedTemperature = targetTemperature->getValue();
+        Serial.println(Kvalue);
+        Serial.println(Lvalue);
+        Serial.println(Gvalue);
 
-        double valueToCompare;
+        double valueToCompare = 0;
+        int numberOfTemperatures = 0;
 
         switch (heatingType->getValue()){
             case 0: //minimum
-                valueToCompare = temp1Value;
-                if(valueToCompare > temp2Value) valueToCompare = temp2Value;
-                if(valueToCompare > temp3Value) valueToCompare = temp3Value;
+                valueToCompare = 1000;
+                if(heatKristiansRoom->getValue()){
+                    if(Kvalue < valueToCompare){
+                        valueToCompare = Kvalue;
+                    }
+                }
+                if(heatLivingRoom->getValue()){
+                    if(Lvalue < valueToCompare){
+                        valueToCompare = Lvalue;
+                    }
+                }
+                if(heatGoransRoom->getValue()){
+                    if(Gvalue < valueToCompare){
+                        valueToCompare = Gvalue;
+                    }
+                }
                 Serial.println("using minumum value");
-            break;
-            case 1: //srednji
-                if ((temp1Value <= temp2Value && temp2Value <= temp3Value) || (temp3Value <= temp2Value && temp2Value <= temp1Value)) {
-                    valueToCompare = temp2Value;
-                } else if ((temp2Value <= temp1Value && temp1Value <= temp3Value) || (temp3Value <= temp1Value && temp1Value <= temp2Value)) {
-                    valueToCompare = temp1Value;
-                } else {
-                    valueToCompare = temp3Value;
+                break;
+            case 1: //average
+                if(heatKristiansRoom->getValue()){
+                    valueToCompare += Kvalue;
+                    Serial.println("dodaj K");
+                    numberOfTemperatures++;
+                }
+                if(heatLivingRoom->getValue()){
+                    valueToCompare += Lvalue;
+                    Serial.println("dodaj L");
+                    numberOfTemperatures++;
+                }
+                if(heatGoransRoom->getValue()){
+                    valueToCompare += Gvalue;
+                    Serial.println("dodaj G");
+                    numberOfTemperatures++;
+                }
+
+                if(numberOfTemperatures > 0){
+                    valueToCompare/=numberOfTemperatures;
+                }
+                else{
+                    valueToCompare = 1000;
                 }
                 Serial.println("using middle value");
                 break;
             case 2: //maksimum
-                valueToCompare = temp1Value;
-                if(valueToCompare < temp2Value) valueToCompare = temp2Value;
-                if(valueToCompare < temp3Value) valueToCompare = temp3Value;
-                Serial.println("using maximum value");
-            break;
-            case 3: //srednja vrijednost
-                valueToCompare = (temp1Value + temp2Value + temp3Value) / 3;
-                Serial.println("using average value");
+                valueToCompare = -1000;
+                bool validValues = false;
+                if(heatKristiansRoom->getValue()){
+                    if(Kvalue > valueToCompare){
+                        valueToCompare = Kvalue;
+                        validValues = true;
+                    }
+                }
+                if(heatLivingRoom->getValue()){
+                    if(Lvalue > valueToCompare){
+                        valueToCompare = Lvalue;
+                        validValues = true;
+                    }
+                }
+                if(heatGoransRoom->getValue()){
+                    if(Gvalue > valueToCompare){
+                        valueToCompare = Gvalue;
+                        validValues = true;
+                    }
+                }
 
-            break;
+                if(validValues == false){
+                    valueToCompare = 1000;
+                }
+                Serial.println("using maximum value");
+                break;
         }
         Serial.println(valueToCompare);
+
+        double wantedTemperature = targetTemperature->getValue();
 
         if(wantedTemperature > valueToCompare){
             //need to turn ON heating
@@ -239,7 +300,7 @@ public:
         if(millis() - heatingRelayStateTimer > 60 * 1000){
             Serial.println("timer OK");
             digitalWrite(heatingRelayPin, state);
-            setButtonField(fieldGroup->getGroupId(), heatingStateField->getId(), state);
+            setButtonField(heatingOptions->getGroupId(), heatingState->getId(), state);
             heatingRelayState = state;
             heatingRelayStateTimer = millis();
         }
