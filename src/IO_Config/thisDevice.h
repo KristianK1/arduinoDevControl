@@ -16,8 +16,8 @@
 
 OneWire oneWire1(25);
 OneWire oneWire2(26);
-OneWire oneWire3(32);
-OneWire oneWire4(27);
+OneWire oneWire3(27);
+OneWire oneWire4(32);
 
 int heatingRelayPin = 33;
 
@@ -29,6 +29,10 @@ DallasTemperature sensors4(&oneWire4);
 bool newTargetTemperatureFlag = true;
 
 void emptyFunctionNumericField(double data){
+
+}
+
+void emptyFunctionMCField(int data){
 
 }
 
@@ -46,25 +50,28 @@ class ThisDevice : protected FieldGroups, protected ComplexGroups
 private:
 
     NumericField *temp1 = 
-        new NumericField(0, "Room1 temperature",  OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
+        new NumericField(0, "Soba1",  OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
 
     NumericField *temp2 = 
-        new NumericField(1, "Room2 temperature", OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
+        new NumericField(1, "Dnevna soba", OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
 
     NumericField *temp3 = 
-        new NumericField(2, "Room3 temperature",  OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
+        new NumericField(2, "Soba2",  OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
 
     NumericField *temp4 = 
-        new NumericField(3, "Room4 temperature", OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
+        new NumericField(3, "Vanjska", OUTPUT_FIELD, -20.0, 80.0, 0.5, "", "°C", emptyFunctionNumericField);
+       
+    MultipleChoiceField *heatingType = 
+        new MultipleChoiceField(4, "Heating type", INPUT_FIELD, emptyFunctionMCField, 4, "Minimum", "Srednji", "Maksimum", "Srednja vrijednost");
 
     NumericField *targetTemperature = 
-        new NumericField(2, "Target temperature", INPUT_FIELD, 10.0, 30.0, 0.5, "", "°C", wantedTemperatureChanged);
+        new NumericField(5, "Target temperature", INPUT_FIELD, 10.0, 30.0, 0.5, "", "°C", wantedTemperatureChanged);
 
     ButtonField *heatingStateField = 
-        new ButtonField(3, "Heating state", OUTPUT_FIELD, false, emptyFunctionButtonField);
+        new ButtonField(6, "Heating state", OUTPUT_FIELD, false, emptyFunctionButtonField);
 
     FieldGroup *fieldGroup =
-        new FieldGroup(0, "Heating system", 4, temp1, temp2, temp3, temp4);
+        new FieldGroup(0, "Heating system", 7, temp1, temp2, temp3, temp4, heatingType, targetTemperature, heatingStateField);
 
     boolean heatingRelayState = false;
     double heatingRelayStateTimer = 0;
@@ -171,10 +178,51 @@ public:
     }
 
     void wantedTemperatureLoop(){
-        double roomTemp = temp1->getValue();
+        double temp1Value = temp1->getValue();
+        double temp2Value = temp2->getValue();
+        double temp3Value = temp3->getValue();
+        
+        Serial.println("Temperature values: ");
+        Serial.println(temp1Value);
+        Serial.println(temp2Value);
+        Serial.println(temp3Value);
+        
         double wantedTemperature = targetTemperature->getValue();
 
-        if(wantedTemperature > roomTemp){
+        double valueToCompare;
+
+        switch (heatingType->getValue()){
+            case 0: //minimum
+                valueToCompare = temp1Value;
+                if(valueToCompare > temp2Value) valueToCompare = temp2Value;
+                if(valueToCompare > temp3Value) valueToCompare = temp3Value;
+                Serial.println("using minumum value");
+            break;
+            case 1: //srednji
+                if ((temp1Value <= temp2Value && temp2Value <= temp3Value) || (temp3Value <= temp2Value && temp2Value <= temp1Value)) {
+                    valueToCompare = temp2Value;
+                } else if ((temp2Value <= temp1Value && temp1Value <= temp3Value) || (temp3Value <= temp1Value && temp1Value <= temp2Value)) {
+                    valueToCompare = temp1Value;
+                } else {
+                    valueToCompare = temp3Value;
+                }
+                Serial.println("using middle value");
+                break;
+            case 2: //maksimum
+                valueToCompare = temp1Value;
+                if(valueToCompare < temp2Value) valueToCompare = temp2Value;
+                if(valueToCompare < temp3Value) valueToCompare = temp3Value;
+                Serial.println("using maximum value");
+            break;
+            case 3: //srednja vrijednost
+                valueToCompare = (temp1Value + temp2Value + temp3Value) / 3;
+                Serial.println("using average value");
+
+            break;
+        }
+        Serial.println(valueToCompare);
+
+        if(wantedTemperature > valueToCompare){
             //need to turn ON heating
             changeHeatingRelayState(true);
         }
