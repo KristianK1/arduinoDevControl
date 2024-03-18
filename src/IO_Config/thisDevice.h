@@ -136,7 +136,7 @@ public:
         float tempC = sensors2.getTempCByIndex(0);
         // Serial.println(tempC);
 
-        float currentValue = heatLivingRoom->getValue();
+        float currentValue = LivingRoomTemp->getValue();
         // Serial.println(currentValue);
 
         double newTemp_normalized = int(tempC / LivingRoomTemp->getStep()) * LivingRoomTemp->getStep();
