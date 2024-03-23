@@ -299,10 +299,15 @@ public:
 
         if(millis() - heatingRelayStateTimer > 60 * 1000){
             Serial.println("timer OK");
-            digitalWrite(heatingRelayPin, state);
-            setButtonField(heatingOptions->getGroupId(), heatingState->getId(), state);
-            heatingRelayState = state;
-            heatingRelayStateTimer = millis();
+            if(getButtonFieldValue(heatingOptions->getGroupId(), heatingState->getId()) != state){
+                Serial.println("state OK");
+                setButtonField(heatingOptions->getGroupId(), heatingState->getId(), state);
+                heatingRelayState = state;
+                heatingRelayStateTimer = millis();
+                digitalWrite(heatingRelayPin, state);
+            } else {
+                Serial.println("state NOT OK");
+            }
         }
         else{
             Serial.println("timer NOT OK");
