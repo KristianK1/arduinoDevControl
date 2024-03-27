@@ -109,87 +109,25 @@ public:
     }
 
 
-    void temperatureLoop1(){
-        sensors1.begin();
-        sensors1.requestTemperatures(); // Send the command to get temperatures
-        float tempC = sensors1.getTempCByIndex(0);
+    void temperatureLoop(DallasTemperature sensor, NumericField *temperatureField, float stepPercentageLimit){
+        sensor.begin();
+        sensor.requestTemperatures(); // Send the command to get temperatures
+        float tempC = sensor.getTempCByIndex(0);
         // Serial.println(tempC);
 
-        float currentValue = KristiansRoomTemp->getValue();
+        float currentValue = temperatureField->getValue();
         // Serial.println(currentValue);
 
-        double newTemp_normalized = int(tempC / KristiansRoomTemp->getStep()) * KristiansRoomTemp->getStep();
+        double newTemp_normalized = int(tempC / temperatureField->getStep()) * temperatureField->getStep();
 
         float diff = currentValue - tempC;
         if(diff < 0){
             diff *= -1;
         }
-
-        if(diff >= KristiansRoomTemp->getStep() * 1){
-            setNumericField(tempGroup->getGroupId(), KristiansRoomTemp->getId(), newTemp_normalized);
-        }
-    }
-
-    void temperatureLoop2(){
-        sensors2.begin();
-        sensors2.requestTemperatures(); // Send the command to get temperatures
-        float tempC = sensors2.getTempCByIndex(0);
-        // Serial.println(tempC);
-
-        float currentValue = LivingRoomTemp->getValue();
-        // Serial.println(currentValue);
-
-        double newTemp_normalized = int(tempC / LivingRoomTemp->getStep()) * LivingRoomTemp->getStep();
-
-        float diff = currentValue - tempC;
-        if(diff < 0){
-            diff *= -1;
-        }
-
-        if(diff >= LivingRoomTemp->getStep() * 1){
-            setNumericField(tempGroup->getGroupId(), LivingRoomTemp->getId(), newTemp_normalized);
-        }
-    }
-
-    void temperatureLoop3(){
-        sensors3.begin();
-        sensors3.requestTemperatures(); // Send the command to get temperatures
-        float tempC = sensors3.getTempCByIndex(0);
-        // Serial.println(tempC);
-
-        float currentValue = GoransRoomTemp->getValue();
-        // Serial.println(currentValue);
-
-        double newTemp_normalized = int(tempC / GoransRoomTemp->getStep()) * GoransRoomTemp->getStep();
-
-        float diff = currentValue - tempC;
-        if(diff < 0){
-            diff *= -1;
-        }
-
-        if(diff >= GoransRoomTemp->getStep() * 1){
-            setNumericField(tempGroup->getGroupId(), GoransRoomTemp->getId(), newTemp_normalized);
-        }
-    }
-    
-    void temperatureLoop4(){
-        sensors4.begin();
-        sensors4.requestTemperatures(); // Send the command to get temperatures
-        float tempC = sensors4.getTempCByIndex(0);
-        // Serial.println(tempC);
-
-        float currentValue = HallwayTemp->getValue();
-        // Serial.println(currentValue);
-
-        double newTemp_normalized = int(tempC / HallwayTemp->getStep()) * HallwayTemp->getStep();
-
-        float diff = currentValue - tempC;
-        if(diff < 0){
-            diff *= -1;
-        }
-
-        if(diff >= HallwayTemp->getStep() * 1){
-            setNumericField(tempGroup->getGroupId(), HallwayTemp->getId(), newTemp_normalized);
+        if(newTemp_normalized >= temperatureField->getMin() && newTemp_normalized <= temperatureField->getMax()){
+            if(diff >= temperatureField->getStep() * stepPercentageLimit){
+                setNumericField(tempGroup->getGroupId(), temperatureField->getId(), newTemp_normalized);
+            }
         }
     }
 
@@ -299,15 +237,13 @@ public:
 
         if(millis() - heatingRelayStateTimer > 60 * 1000){
             Serial.println("timer OK");
-            if(getButtonFieldValue(heatingOptions->getGroupId(), heatingState->getId()) != state){
-                Serial.println("state OK");
-                setButtonField(heatingOptions->getGroupId(), heatingState->getId(), state);
-                heatingRelayState = state;
-                heatingRelayStateTimer = millis();
-                digitalWrite(heatingRelayPin, state);
-            } else {
-                Serial.println("state NOT OK");
-            }
+            digitalWrite(heatingRelayPin, state);
+            setButtonField(heatingOptions->getGroupId(), heatingState->getId(), state);
+            Serial.println("setting state");
+            Serial.println(heatingRelayState);
+            Serial.println(state);
+            heatingRelayState = state;
+            heatingRelayStateTimer = millis();
         }
         else{
             Serial.println("timer NOT OK");
@@ -316,10 +252,10 @@ public:
     }
 
     void loop(){
-        temperatureLoop1();
-        temperatureLoop2();
-        temperatureLoop3();
-        temperatureLoop4();
+        temperatureLoop(sensors1, KristiansRoomTemp, 1);
+        temperatureLoop(sensors2, LivingRoomTemp,1);
+        temperatureLoop(sensors3, GoransRoomTemp,1);
+        temperatureLoop(sensors4, HallwayTemp, 1);
         wantedTemperatureLoop();
     }
 
