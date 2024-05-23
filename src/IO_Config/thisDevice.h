@@ -297,7 +297,7 @@ public:
         Serial.println("enter change heating state function");
         if(heatingRelayState == state) return;
 
-        if(millis() - heatingRelayStateTimer > 60 * 1000){
+        if(millis() - heatingRelayStateTimer > 3 * 60 * 1000){
             Serial.println("timer OK");
             if(getButtonFieldValue(heatingOptions->getGroupId(), heatingState->getId()) != state){
                 Serial.println("state OK");
