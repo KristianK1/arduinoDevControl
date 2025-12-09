@@ -4,7 +4,7 @@
 class ServerLink {
 
     private:
-    String basicLink = "devcontrol-backend.onrender.com";
+    String basicLink = "backenddevcontrol.onrender.com";
     // String basicLink = "devcontrol.herokuapp.com";
     // String basicLink = "192.168.1.205";
 
