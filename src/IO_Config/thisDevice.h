@@ -19,6 +19,11 @@ OneWire oneWire2(26);
 OneWire oneWire3(27);
 OneWire oneWire4(32);
 
+int timeLastSent1 = -1000000;
+int timeLastSent2 = -1000000;
+int timeLastSent3 = -1000000;
+int timeLastSent4 = -1000000;
+
 int heatingRelayPin = 33;
 
 DallasTemperature sensors1(&oneWire1);
@@ -44,6 +49,7 @@ void wantedTemperatureChanged(double wantedTemperature){
     
 }
 
+int temperatureStepToTimeMapper[] = {120,60,50,40,35,30,25,20,15,10};
 
 class ThisDevice : protected FieldGroups, protected ComplexGroups
 {
@@ -109,88 +115,41 @@ public:
     }
 
 
-    void temperatureLoop1(){
-        sensors1.begin();
-        sensors1.requestTemperatures(); // Send the command to get temperatures
-        float tempC = sensors1.getTempCByIndex(0);
-        // Serial.println(tempC);
+    void temperatureLoop(DallasTemperature sensor, NumericField *temperatureField, float stepPercentageLimit, int *timeLastSent){
+        sensor.begin();
+        sensor.requestTemperatures(); // Send the command to get temperatures
+        float tempC = sensor.getTempCByIndex(0);
 
-        float currentValue = KristiansRoomTemp->getValue();
-        // Serial.println(currentValue);
+        float currentValue = temperatureField->getValue();
 
-        double newTemp_normalized = int(tempC / KristiansRoomTemp->getStep()) * KristiansRoomTemp->getStep();
+        double newTemp_normalized = round(tempC / temperatureField->getStep()) * temperatureField->getStep();
 
         float diff = currentValue - tempC;
-        if(diff < 0){
-            diff *= -1;
-        }
 
-        if(diff >= KristiansRoomTemp->getStep() * 1){
-            setNumericField(tempGroup->getGroupId(), KristiansRoomTemp->getId(), newTemp_normalized);
-        }
-    }
+        diff = diff > 0? diff: -1 * diff;
+        Serial.print("diff ");
+        Serial.println(diff);
 
-    void temperatureLoop2(){
-        sensors2.begin();
-        sensors2.requestTemperatures(); // Send the command to get temperatures
-        float tempC = sensors2.getTempCByIndex(0);
-        // Serial.println(tempC);
+        if(newTemp_normalized < temperatureField->getMin() || newTemp_normalized > temperatureField->getMax()) return;
 
-        float currentValue = LivingRoomTemp->getValue();
-        // Serial.println(currentValue);
+        if(diff < temperatureField->getStep() * stepPercentageLimit) return;
+        
+        int steps = fabs((newTemp_normalized - currentValue)/temperatureField->getStep());
+        Serial.print("number of steps ");
+        Serial.println(steps);
+        if(steps > 10) steps = 10;
 
-        double newTemp_normalized = int(tempC / LivingRoomTemp->getStep()) * LivingRoomTemp->getStep();
+        Serial.print("time needed ");
+        int timeNeeded = temperatureStepToTimeMapper[steps - 1] * 1000;
+        Serial.println(timeNeeded);
 
-        float diff = currentValue - tempC;
-        if(diff < 0){
-            diff *= -1;
-        }
+        Serial.print("time elapsed ");
+        Serial.println(millis() - *timeLastSent );        
 
-        if(diff >= LivingRoomTemp->getStep() * 1){
-            setNumericField(tempGroup->getGroupId(), LivingRoomTemp->getId(), newTemp_normalized);
-        }
-    }
-
-    void temperatureLoop3(){
-        sensors3.begin();
-        sensors3.requestTemperatures(); // Send the command to get temperatures
-        float tempC = sensors3.getTempCByIndex(0);
-        // Serial.println(tempC);
-
-        float currentValue = GoransRoomTemp->getValue();
-        // Serial.println(currentValue);
-
-        double newTemp_normalized = int(tempC / GoransRoomTemp->getStep()) * GoransRoomTemp->getStep();
-
-        float diff = currentValue - tempC;
-        if(diff < 0){
-            diff *= -1;
-        }
-
-        if(diff >= GoransRoomTemp->getStep() * 1){
-            setNumericField(tempGroup->getGroupId(), GoransRoomTemp->getId(), newTemp_normalized);
-        }
-    }
-    
-    void temperatureLoop4(){
-        sensors4.begin();
-        sensors4.requestTemperatures(); // Send the command to get temperatures
-        float tempC = sensors4.getTempCByIndex(0);
-        // Serial.println(tempC);
-
-        float currentValue = HallwayTemp->getValue();
-        // Serial.println(currentValue);
-
-        double newTemp_normalized = int(tempC / HallwayTemp->getStep()) * HallwayTemp->getStep();
-
-        float diff = currentValue - tempC;
-        if(diff < 0){
-            diff *= -1;
-        }
-
-        if(diff >= HallwayTemp->getStep() * 1){
-            setNumericField(tempGroup->getGroupId(), HallwayTemp->getId(), newTemp_normalized);
-        }
+        if(millis() - *timeLastSent < timeNeeded) return;
+        Serial.print("sent");
+        setNumericField(tempGroup->getGroupId(), temperatureField->getId(), newTemp_normalized);
+        *timeLastSent = millis();
     }
 
     void wantedTemperatureLoop(){
@@ -198,11 +157,6 @@ public:
         double Lvalue = LivingRoomTemp->getValue();
         double Gvalue = GoransRoomTemp->getValue();
         
-        Serial.println("Temperature values: ");
-        Serial.println(Kvalue);
-        Serial.println(Lvalue);
-        Serial.println(Gvalue);
-
         double valueToCompare = 0;
         int numberOfTemperatures = 0;
 
@@ -224,22 +178,18 @@ public:
                         valueToCompare = Gvalue;
                     }
                 }
-                Serial.println("using minumum value");
                 break;
             case 1: //average
                 if(heatKristiansRoom->getValue()){
                     valueToCompare += Kvalue;
-                    Serial.println("dodaj K");
                     numberOfTemperatures++;
                 }
                 if(heatLivingRoom->getValue()){
                     valueToCompare += Lvalue;
-                    Serial.println("dodaj L");
                     numberOfTemperatures++;
                 }
                 if(heatGoransRoom->getValue()){
                     valueToCompare += Gvalue;
-                    Serial.println("dodaj G");
                     numberOfTemperatures++;
                 }
 
@@ -249,7 +199,6 @@ public:
                 else{
                     valueToCompare = 1000;
                 }
-                Serial.println("using middle value");
                 break;
             case 2: //maksimum
                 valueToCompare = -1000;
@@ -276,10 +225,8 @@ public:
                 if(validValues == false){
                     valueToCompare = 1000;
                 }
-                Serial.println("using maximum value");
                 break;
         }
-        Serial.println(valueToCompare);
 
         double wantedTemperature = targetTemperature->getValue();
 
@@ -294,7 +241,6 @@ public:
     }
 
     void changeHeatingRelayState(boolean state){
-        Serial.println("enter change heating state function");
         if(heatingRelayState == state) return;
 
         if(millis() - heatingRelayStateTimer > 3 * 60 * 1000){
@@ -316,10 +262,10 @@ public:
     }
 
     void loop(){
-        temperatureLoop1();
-        temperatureLoop2();
-        temperatureLoop3();
-        temperatureLoop4();
+        temperatureLoop(sensors1, KristiansRoomTemp, 0.8, &timeLastSent1);
+        temperatureLoop(sensors2, LivingRoomTemp, 0.8, &timeLastSent2);
+        temperatureLoop(sensors3, GoransRoomTemp, 0.8, &timeLastSent3);
+        temperatureLoop(sensors4, HallwayTemp, 0.8, &timeLastSent4);
         wantedTemperatureLoop();
     }
 
